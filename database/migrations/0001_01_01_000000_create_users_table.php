@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->integer('department_id');
+            $table->string('api_token', 80)->unique()->nullable()->default(null);
+            $table->integer('department_id')->nullable();
             $table->integer('role_id')->default(1); // 1 = default user
             $table->boolean('verified')->default(false);
             $table->boolean('blocked')->default(false);

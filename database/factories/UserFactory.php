@@ -27,6 +27,7 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'password' => static::$password ??= bcrypt('password'),
+            'api_token' => Str::random(60),
 
             'department_id' => fake()->numberBetween(1, 3),
             'role_id' => fake()->numberBetween(1, 2),
@@ -35,15 +36,5 @@ class UserFactory extends Factory
 
             'remember_token' => Str::random(10),
         ];
-    }
-
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
     }
 }
