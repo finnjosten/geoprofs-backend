@@ -6,8 +6,52 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class UserController extends Controller
-{
+class UserController extends Controller {
+
+    private $request_fields = array(
+        'email',
+
+        'role_slug',
+        'department_slug',
+        'subdepartment_slug',
+        'supervisor_id',
+
+        'blocked',
+        'verified',
+
+        'first_name',
+        'sure_name',
+        'bsn',
+        'date_of_service',
+
+        'sick_days',
+        'vac_days',
+        'personal_days',
+        'max_vac_days'
+    );
+    private $validator_fields = array(
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:8|max:64',
+
+        'role_slug' => 'nullable|string|exists:roles,slug',
+        'department_slug' => 'nullable|string|exists:departments,slug',
+        'subdepartment_slug' => 'nullable|string|exists:subdepartments,slug',
+        'supervisor_id' => 'nullable|integer|exists:users,id',
+
+        'blocked' => 'nullable|boolean',
+        'verified' => 'nullable|boolean',
+
+        'first_name' => 'required|string|max:64',
+        'sure_name' => 'required|string|max:64',
+        'bsn' => 'required|string|max:9|unique:users,bsn',
+        'date_of_service' => 'required|date',
+
+        'sick_days' => 'nullable|integer',
+        'vac_days' => 'nullable|integer',
+        'personal_days' => 'nullable|integer',
+        'max_vac_days' => 'nullable|integer',
+    );
+
     /**
      * Display a listing of the resource.
      */
@@ -21,52 +65,10 @@ class UserController extends Controller
      */
     public function store(Request $request) {
 
-        $data = $request->only(
-            'email',
-            'password',
-
-            'role_slug',
-            'department_slug',
-            'subdepartment_slug',
-            'supervisor_id',
-
-            'blocked',
-            'verified',
-
-            'first_name',
-            'sure_name',
-            'bsn',
-            'date_of_service',
-
-            'sick_days',
-            'vac_days',
-            'personal_days',
-            'max_vac_days'
-        );
+        $data = $request->only(...$this->request_fields);
 
         // Define validation rules
-        $validator = Validator::make($data, [
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|max:64',
-
-            'role_slug' => 'nullable|string|exists:roles,slug',
-            'department_slug' => 'nullable|string|exists:departments,slug',
-            'subdepartment_slug' => 'nullable|string|exists:subdepartments,slug',
-            'supervisor_id' => 'nullable|integer|exists:users,id',
-
-            'blocked' => 'nullable|boolean',
-            'verified' => 'nullable|boolean',
-
-            'first_name' => 'required|string|max:64',
-            'sure_name' => 'required|string|max:64',
-            'bsn' => 'required|string|max:9|unique:users,bsn',
-            'date_of_service' => 'required|date',
-
-            'sick_days' => 'nullable|integer',
-            'vac_days' => 'nullable|integer',
-            'personal_days' => 'nullable|integer',
-            'max_vac_days' => 'nullable|integer',
-        ]);
+        $validator = Validator::make($data, $this->validator_fields);
 
         // Check if the validation fails
         if ($validator->fails()) {
@@ -120,51 +122,10 @@ class UserController extends Controller
      */
     public function update(Request $request, $user_id) {
 
-        $data = $request->only(
-            'email',
-
-            'role_slug',
-            'department_slug',
-            'subdepartment_slug',
-            'supervisor_id',
-
-            'blocked',
-            'verified',
-
-            'first_name',
-            'sure_name',
-            'bsn',
-            'date_of_service',
-
-            'sick_days',
-            'vac_days',
-            'personal_days',
-            'max_vac_days'
-        );
+        $data = $request->only(...$this->request_fields);
 
         // Define validation rules
-        $validator = Validator::make($data, [
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|max:64',
-
-            'role_slug' => 'nullable|string|exists:roles,slug',
-            'department_slug' => 'nullable|string|exists:departments,slug',
-            'subdepartment_slug' => 'nullable|string|exists:subdepartments,slug',
-            'supervisor_id' => 'nullable|integer|exists:users,id',
-
-            'blocked' => 'nullable|boolean',
-            'verified' => 'nullable|boolean',
-
-            'first_name' => 'required|string|max:64',
-            'sure_name' => 'required|string|max:64',
-            'bsn' => 'required|string|max:9|unique:users,bsn',
-            'date_of_service' => 'required|date',
-
-            'sick_days' => 'nullable|integer',
-            'vac_days' => 'nullable|integer',
-            'personal_days' => 'nullable|integer',
-            'max_vac_days' => 'nullable|integer',
-        ]);
+        $validator = Validator::make($data, $this->validator_fields);
 
         // Check if the validation fails
         if ($validator->fails()) {
@@ -211,8 +172,22 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
-    {
-        //
+    public function destroy($user_id) {
+
+        $user = User::whereId($user_id)->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found!',
+            ], 404);
+        }
+
+        $user->tokens()->delete();
+        $user->delete();
+
+        return response()->json([
+            'message' => 'User deleted successfully!',
+        ]);
+
     }
 }

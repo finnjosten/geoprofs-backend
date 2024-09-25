@@ -13,17 +13,15 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::get('/', function () {
-    abort(404);
-});
+Route::get('/', function () { abort(404); });
 
 Route::group(['prefix' => 'auth'], function () {
-    Route::post('/login',               [AuthController::class, 'login']    )->name('auth.login');
-    Route::post('/logout',              [AuthController::class, 'logout']   )->name('auth.logout');
+    Route::post('/login',           [AuthController::class, 'login']    )->name('login');
+    Route::post('/logout',          [AuthController::class, 'logout']   )->name('logout')->middleware('auth:sanctum');;
 });
 
-Route::get('users/',                    [UserController::class, 'index']    )->name('users.index');
-Route::post('users/create',             [UserController::class, 'create']   )->name('users.create');
-Route::get('users/{user_id}',           [UserController::class, 'show']     )->name('users.show');
-Route::post('users/{user_id}/update',   [UserController::class, 'update']   )->name('users.update');
-Route::post('users/{user_id}/delete',   [UserController::class, 'delete']   )->name('users.delete');
+Route::get('users/',                [UserController::class, 'index']    )->name('users.index')->middleware('auth:sanctum');;
+Route::post('users/create',         [UserController::class, 'store']    )->name('users.create');
+Route::get('users/{id}',            [UserController::class, 'show']     )->name('users.show')->middleware('auth:sanctum');;
+Route::post('users/{id}/update',    [UserController::class, 'update']   )->name('users.update')->middleware('auth:sanctum');;
+Route::delete('users/{id}/delete',  [UserController::class, 'destroy']  )->name('users.delete')->middleware('auth:sanctum');;
