@@ -8,9 +8,9 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 
-Route::get('/user', function (Request $request) {
+/* Route::get('/user', function (Request $request) {
     return $request->user();
-})->middleware('auth:sanctum');
+})->middleware('auth:sanctum'); */
 
 
 Route::get('/', function () { abort(404); });
@@ -23,7 +23,8 @@ Route::group(['prefix' => 'auth'], function () {
 // Allow creating users without auth when app is in local mode
 if (env('APP_ENV') == 'local') Route::post('users/create',[UserController::class, 'store'])->name('users.create');
 if (env('APP_ENV') != 'local') Route::post('users/create',[UserController::class, 'store'])->name('users.create')->middleware('auth:sanctum');
-Route::get      ('users/',                  [UserController::class, 'index']    )->name('users.index')->middleware('auth:sanctum');
-Route::get      ('users/{id}',              [UserController::class, 'show']     )->name('users.show')->middleware('auth:sanctum');
-Route::post     ('users/{id}/update',       [UserController::class, 'update']   )->name('users.update')->middleware('auth:sanctum');
-Route::delete   ('users/{id}/delete',       [UserController::class, 'destroy']  )->name('users.delete')->middleware('auth:sanctum');
+Route::get      ('user/',                   [UserController::class, 'showCurrent']  )->name('users.index')->middleware('auth:sanctum');
+Route::get      ('users/',                  [UserController::class, 'index']        )->name('users.index')->middleware('auth:sanctum');
+Route::get      ('users/{id}',              [UserController::class, 'show']         )->name('users.show')->middleware('auth:sanctum');
+Route::post     ('users/{id}/update',       [UserController::class, 'update']       )->name('users.update')->middleware('auth:sanctum');
+Route::delete   ('users/{id}/delete',       [UserController::class, 'destroy']      )->name('users.delete')->middleware('auth:sanctum');

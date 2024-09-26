@@ -8,6 +8,11 @@ use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @group Authentication
+ *
+ * APIs for authenticating users
+ */
 class AuthController extends Controller {
 
     public function login(Request $request) {
@@ -24,14 +29,14 @@ class AuthController extends Controller {
         if ($validator->fails()) {
             // Return a JSON response with validation errors
             return response()->json([
-                'errors' => $validator->errors(),
+                'error' => $validator->errors(),
                 'code' => 'validation_error',
             ], 422);
         }
 
         if (!Auth::attempt($data)) {
             return response()->json([
-                'message' => 'Invalid credentials',
+                'error' => 'Invalid credentials',
                 'code' => 'invalid_credentials',
             ], 401);
         }
@@ -42,14 +47,15 @@ class AuthController extends Controller {
 
         if ($user->blocked) {
             return response()->json([
-                'message' => 'User is blocked',
+                'error' => 'User is blocked',
                 'code' => 'blocked',
             ], 401);
         }
 
         if (!$user->verified) {
+            $user->sendEmailVerificationNotification();
             return response()->json([
-                'message' => 'User needs verification',
+                'error' => 'User needs verification',
                 'code' => 'verification_required',
             ], 401);
         }

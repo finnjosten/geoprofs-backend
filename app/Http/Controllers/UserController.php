@@ -6,6 +6,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
+/**
+ * @group User management
+ *
+ * APIs for managing users
+ */
 class UserController extends Controller {
 
     private $request_fields = array(
@@ -53,7 +58,7 @@ class UserController extends Controller {
     );
 
     /**
-     * Display a listing of the resource.
+     * Display a all users.
      */
     public function index() {
         $users = User::all();
@@ -61,7 +66,7 @@ class UserController extends Controller {
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created user.
      */
     public function store(Request $request) {
 
@@ -111,14 +116,21 @@ class UserController extends Controller {
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified user.
      */
     public function show($user_id) {
         return response()->json(["data" => User::whereId($user_id)->first()]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Display the current user.
+     */
+    public function showCurrent(Request $request) {
+        return response()->json(["data" => $request->user()]);
+    }
+
+    /**
+     * Update the specified user.
      */
     public function update(Request $request, $user_id) {
 
