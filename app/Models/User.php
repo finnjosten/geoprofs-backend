@@ -70,4 +70,20 @@ class User extends Authenticatable
     public function isBlocked() {
         return Auth::user()->blocked;
     }
+
+    public function isAdmin() {
+        return Auth::user()->role_slug == 'admin';
+    }
+
+    public function isEmployee() {
+        return Auth::user()->role_slug == 'employee';
+    }
+
+    public function supervisor() {
+        return $this->belongsTo(User::class, 'supervisor_id');
+    }
+
+    public function sendVerifyEmail() {
+        return $this->verified = true;
+    }
 }

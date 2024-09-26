@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "GeoProfs",
-        "_postman_id": "e1867f98-7854-46aa-92f7-bdcb31227211",
+        "_postman_id": "01535383-e8ca-411e-8b82-db476a77e260",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -41,7 +41,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"email\":\"brooke35@example.org\",\"password\":\"y^k)8L]f\"}"
+                            "raw": "{\"email\":\"christ28@example.org\",\"password\":\"9tQ6zmX'\"}"
                         },
                         "description": "",
                         "auth": {
@@ -82,7 +82,7 @@
         },
         {
             "name": "User management",
-            "description": "\nAPIs for managing users",
+            "description": "",
             "item": [
                 {
                     "name": "Store a newly created user.",
@@ -105,10 +105,7 @@
                             }
                         ],
                         "body": null,
-                        "description": "",
-                        "auth": {
-                            "type": "noauth"
-                        }
+                        "description": ""
                     },
                     "response": []
                 },
@@ -133,10 +130,7 @@
                             }
                         ],
                         "body": null,
-                        "description": "",
-                        "auth": {
-                            "type": "noauth"
-                        }
+                        "description": ""
                     },
                     "response": [
                         {
@@ -161,7 +155,7 @@
                     ]
                 },
                 {
-                    "name": "Display a all users.",
+                    "name": "Display all the users.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
@@ -181,10 +175,7 @@
                             }
                         ],
                         "body": null,
-                        "description": "",
-                        "auth": {
-                            "type": "noauth"
-                        }
+                        "description": ""
                     },
                     "response": [
                         {
@@ -220,7 +211,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "fugiat",
+                                    "value": "quo",
                                     "description": "The ID of the user."
                                 }
                             ]
@@ -237,10 +228,7 @@
                             }
                         ],
                         "body": null,
-                        "description": "",
-                        "auth": {
-                            "type": "noauth"
-                        }
+                        "description": ""
                     },
                     "response": [
                         {
@@ -276,7 +264,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "hic",
+                                    "value": "labore",
                                     "description": "The ID of the user."
                                 }
                             ]
@@ -293,15 +281,12 @@
                             }
                         ],
                         "body": null,
-                        "description": "",
-                        "auth": {
-                            "type": "noauth"
-                        }
+                        "description": ""
                     },
                     "response": []
                 },
                 {
-                    "name": "Remove the specified resource from storage.",
+                    "name": "Remove the specified user.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
@@ -312,7 +297,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "nam",
+                                    "value": "dolor",
                                     "description": "The ID of the user."
                                 }
                             ]
@@ -329,10 +314,7 @@
                             }
                         ],
                         "body": null,
-                        "description": "",
-                        "auth": {
-                            "type": "noauth"
-                        }
+                        "description": ""
                     },
                     "response": []
                 }

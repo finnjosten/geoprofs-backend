@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 
 /**
  * @group User management
+ * @authenticated
  *
  * APIs for managing users
  */
@@ -58,7 +59,7 @@ class UserController extends Controller {
     );
 
     /**
-     * Display a all users.
+     * Display all the users.
      */
     public function index() {
         $users = User::all();
@@ -182,7 +183,7 @@ class UserController extends Controller {
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified user.
      */
     public function destroy($user_id) {
 
