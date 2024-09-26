@@ -16,6 +16,7 @@ class UserController extends Controller {
 
     private $request_fields = array(
         'email',
+        'password',
 
         'role_slug',
         'department_slug',
