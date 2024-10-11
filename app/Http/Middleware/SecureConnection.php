@@ -6,6 +6,8 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use function Laravel\Prompts\error;
+
 class SecureConnection
 {
     /**
@@ -16,11 +18,11 @@ class SecureConnection
     public function handle(Request $request, Closure $next): Response
     {
 
-        return $next($request);
         if ($request->isSecure() || $request->getHost() === 'localhost' || str_ends_with($request->getHost(), '.test')) {
         }
 
-        return response()->json([ 'error' => 'Request must be sent over HTTPS', ], 400);
+        return response()->json([ 'error' => 'Request must be sent over HTTPS ' . $request->getHost(), ], 400);
+        return $next($request);
 
 
     }

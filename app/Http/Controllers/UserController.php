@@ -6,10 +6,61 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class UserController extends Controller
-{
+/**
+ * @group User management
+ * @authenticated
+ *
+ * APIs for managing users
+ */
+class UserController extends Controller {
+
+    private $request_fields = array(
+        'email',
+        'password',
+
+        'role_slug',
+        'department_slug',
+        'subdepartment_slug',
+        'supervisor_id',
+
+        'blocked',
+        'verified',
+
+        'first_name',
+        'sure_name',
+        'bsn',
+        'date_of_service',
+
+        'sick_days',
+        'vac_days',
+        'personal_days',
+        'max_vac_days'
+    );
+    private $validator_fields = array(
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:8|max:64',
+
+        'role_slug' => 'nullable|string|exists:roles,slug',
+        'department_slug' => 'nullable|string|exists:departments,slug',
+        'subdepartment_slug' => 'nullable|string|exists:subdepartments,slug',
+        'supervisor_id' => 'nullable|integer|exists:users,id',
+
+        'blocked' => 'nullable|boolean',
+        'verified' => 'nullable|boolean',
+
+        'first_name' => 'required|string|max:64',
+        'sure_name' => 'required|string|max:64',
+        'bsn' => 'required|string|max:9|unique:users,bsn',
+        'date_of_service' => 'required|date',
+
+        'sick_days' => 'nullable|integer',
+        'vac_days' => 'nullable|integer',
+        'personal_days' => 'nullable|integer',
+        'max_vac_days' => 'nullable|integer',
+    );
+
     /**
-     * Display a listing of the resource.
+     * Display all the users.
      */
     public function index() {
         $users = User::all();
@@ -17,56 +68,14 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created user.
      */
     public function store(Request $request) {
 
-        $data = $request->only(
-            'email',
-            'password',
-
-            'role_slug',
-            'department_slug',
-            'subdepartment_slug',
-            'supervisor_id',
-
-            'blocked',
-            'verified',
-
-            'first_name',
-            'sure_name',
-            'bsn',
-            'date_of_service',
-
-            'sick_days',
-            'vac_days',
-            'personal_days',
-            'max_vac_days'
-        );
+        $data = $request->only(...$this->request_fields);
 
         // Define validation rules
-        $validator = Validator::make($data, [
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|max:64',
-
-            'role_slug' => 'nullable|string|exists:roles,slug',
-            'department_slug' => 'nullable|string|exists:departments,slug',
-            'subdepartment_slug' => 'nullable|string|exists:subdepartments,slug',
-            'supervisor_id' => 'nullable|integer|exists:users,id',
-
-            'blocked' => 'nullable|boolean',
-            'verified' => 'nullable|boolean',
-
-            'first_name' => 'required|string|max:64',
-            'sure_name' => 'required|string|max:64',
-            'bsn' => 'required|string|max:9|unique:users,bsn',
-            'date_of_service' => 'required|date',
-
-            'sick_days' => 'nullable|integer',
-            'vac_days' => 'nullable|integer',
-            'personal_days' => 'nullable|integer',
-            'max_vac_days' => 'nullable|integer',
-        ]);
+        $validator = Validator::make($data, $this->validator_fields);
 
         // Check if the validation fails
         if ($validator->fails()) {
@@ -109,62 +118,28 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified user.
      */
     public function show($user_id) {
         return response()->json(["data" => User::whereId($user_id)->first()]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Display the current user.
+     */
+    public function showCurrent(Request $request) {
+        return response()->json(["data" => $request->user()]);
+    }
+
+    /**
+     * Update the specified user.
      */
     public function update(Request $request, $user_id) {
 
-        $data = $request->only(
-            'email',
-
-            'role_slug',
-            'department_slug',
-            'subdepartment_slug',
-            'supervisor_id',
-
-            'blocked',
-            'verified',
-
-            'first_name',
-            'sure_name',
-            'bsn',
-            'date_of_service',
-
-            'sick_days',
-            'vac_days',
-            'personal_days',
-            'max_vac_days'
-        );
+        $data = $request->only(...$this->request_fields);
 
         // Define validation rules
-        $validator = Validator::make($data, [
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|max:64',
-
-            'role_slug' => 'nullable|string|exists:roles,slug',
-            'department_slug' => 'nullable|string|exists:departments,slug',
-            'subdepartment_slug' => 'nullable|string|exists:subdepartments,slug',
-            'supervisor_id' => 'nullable|integer|exists:users,id',
-
-            'blocked' => 'nullable|boolean',
-            'verified' => 'nullable|boolean',
-
-            'first_name' => 'required|string|max:64',
-            'sure_name' => 'required|string|max:64',
-            'bsn' => 'required|string|max:9|unique:users,bsn',
-            'date_of_service' => 'required|date',
-
-            'sick_days' => 'nullable|integer',
-            'vac_days' => 'nullable|integer',
-            'personal_days' => 'nullable|integer',
-            'max_vac_days' => 'nullable|integer',
-        ]);
+        $validator = Validator::make($data, $this->validator_fields);
 
         // Check if the validation fails
         if ($validator->fails()) {
@@ -209,10 +184,24 @@ class UserController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified user.
      */
-    public function destroy(User $user)
-    {
-        //
+    public function destroy($user_id) {
+
+        $user = User::whereId($user_id)->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found!',
+            ], 404);
+        }
+
+        $user->tokens()->delete();
+        $user->delete();
+
+        return response()->json([
+            'message' => 'User deleted successfully!',
+        ]);
+
     }
 }

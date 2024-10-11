@@ -8,9 +8,15 @@ use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
-class AuthController extends Controller
-{
+/**
+ * @group Authentication
+ *
+ * APIs for authenticating users
+ */
+class AuthController extends Controller {
+
     public function login(Request $request) {
+
         $data = $request->only('email', 'password');
 
         // Define validation rules
@@ -23,17 +29,42 @@ class AuthController extends Controller
         if ($validator->fails()) {
             // Return a JSON response with validation errors
             return response()->json([
-                'errors' => $validator->errors(),
+                'error' => $validator->errors(),
+                'code' => 'validation_error',
             ], 422);
         }
 
         if (!Auth::attempt($data)) {
             return response()->json([
-                'message' => 'Invalid credentials',
+                'error' => 'Invalid credentials',
+                'code' => 'invalid_credentials',
             ], 401);
         }
 
         $user = Auth::user();
+
+        // Check if user is blocked or needs verification
+
+        if ($user->blocked) {
+            return response()->json([
+                'error' => 'User is blocked',
+                'code' => 'blocked',
+            ], 401);
+        }
+
+        if ($user->isVerified()) {
+            $user->sendVerifyEmail();
+            return response()->json([
+                'error' => 'User needs verification',
+                'code' => 'verification_required',
+            ], 401);
+        }
+
+        // Check if the user already has a token
+        if ($user->tokens()->count() > 0) {
+            // Delete the user's token
+            $user->tokens()->delete();
+        }
 
         $token = $user->createToken('authToken', ['*'], now()->addDay())->plainTextToken;
 
@@ -47,6 +78,7 @@ class AuthController extends Controller
         if (!$request->user()) {
             return response()->json([
                 'error' => 'No user logged in',
+                'code' => 'no_user',
             ], 400);
         }
         $request->user()->tokens()->delete();
@@ -56,6 +88,4 @@ class AuthController extends Controller
         ]);
     }
 
-    public function register(Request $request) {
-    }
 }
