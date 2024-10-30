@@ -74,6 +74,45 @@ class AuthController extends Controller {
         ]);
     }
 
+    public function testing(Request $request) {
+        $data = $request->only('testing_key');
+
+        if (env('APP_ENV') != 'testing') {
+            return response()->json([
+                'error' => 'Not in testing environment',
+                'code' => 'not_testing',
+            ], 400);
+        }
+
+        if (!isset($data['testing_key']) || empty($data['testing_key'])) {
+            return response()->json([
+                'error' => 'No testing key provided',
+                'code' => 'no_key',
+            ], 400);
+        }
+
+        // Make sure not everyone can just get an testing token
+        if ($data['testing_key'] != 'MKfUKBND9s901CkR2aj5MIagDlM7jXAl') {
+            return response()->json([
+                'error' => 'Invalid testing key',
+                'code' => 'invalid_key',
+            ], 400);
+        }
+
+        $user = User::where('email', 'testing-user@app.com')->first();
+        if (!$user) {
+            $user = User::factory()->create(["email"=>"testing-user@app.com"]);
+        }
+
+        $token = $user->createToken('authToken', ['*'], now()->addDay())->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+        ]);
+    }
+
     public function logout(Request $request) {
         if (!$request->user()) {
             return response()->json([
