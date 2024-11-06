@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\User;
 use Tests\TestCase;
 
 class UserTest extends TestCase
@@ -36,6 +37,7 @@ class UserTest extends TestCase
 
     public function test_get_user() : void {
 
+        // Pre set condition login
         $this->set_api_token();
 
         $response = $this->withHeaders([
@@ -46,6 +48,12 @@ class UserTest extends TestCase
         $response->assertStatus(200);
         $this->assertIsObject($data);
         $this->assertNotEmpty($data);
+
+
+        // Logout the user
+        $this->withHeaders([
+            'Authorization' => 'Bearer ' . $this->api_token,
+        ])->get('/api/auth/testing-logout/');
     }
 
     public function test_remove_user(): void {
@@ -58,9 +66,16 @@ class UserTest extends TestCase
      */
     public function test_create_user(): void {
 
-        $response = $this->post("/api/users/create", [
-            'email' => 'test@testtest.com',
-            'password' => 'TestingPassword',
+        // Pre set condition login
+        $this->set_api_token();
+
+
+        // Create a user
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $this->api_token,
+        ])->post('/api/users/create', [
+            'email' => 'test-user@app.com',
+            'password' => 'password',
 
             'role_slug' => 'medewerker',
             'department_slug' => null,
@@ -81,13 +96,29 @@ class UserTest extends TestCase
             'max_vac_days' => 15,
         ]);
 
+
+
         $response->assertStatus(200);
 
-    }
+        // End condition remove the user we made and logout
+        $content = json_decode($response->getContent());
+        $user_id = null;
 
+        if (!isset($content->error)) {
+            $user_id = $content->user->id;
+        }
 
-    public function __destruct() {
-        // remove any user we created as we are still pushing to the database
+        // remove any user we created as we are still pushing to the live database
+        if ($user_id && $this->api_token) {
+            $this->withHeaders([
+                'Authorization' => 'Bearer ' . $this->api_token,
+            ])->delete('/api/users/'.$user_id.'/delete');
+        }
+
+        // Logout the user
+        $this->withHeaders([
+            'Authorization' => 'Bearer ' . $this->api_token,
+        ])->get('/api/auth/testing-logout/');
 
     }
 }

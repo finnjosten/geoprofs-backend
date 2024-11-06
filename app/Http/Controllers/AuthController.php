@@ -69,11 +69,31 @@ class AuthController extends Controller {
         $token = $user->createToken('authToken', ['*'], now()->addDay())->plainTextToken;
 
         return response()->json([
+            'success' => true,
             'access_token' => $token,
             'token_type' => 'Bearer',
         ]);
     }
 
+    public function logout(Request $request) {
+        if (!$request->user()) {
+            return response()->json([
+                'error' => 'No user logged in',
+                'code' => 'no_user',
+            ], 400);
+        }
+        $request->user()->tokens()->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Successfully logged out'
+        ]);
+    }
+
+
+    /**
+     * Login for testing (create a user and return the token + user)
+     */
     public function testing(Request $request) {
         $data = $request->only('testing_key');
 
@@ -107,22 +127,31 @@ class AuthController extends Controller {
         $token = $user->createToken('authToken', ['*'], now()->addDay())->plainTextToken;
 
         return response()->json([
+            'success' => true,
             'access_token' => $token,
             'token_type' => 'Bearer',
             'user' => $user,
         ]);
     }
 
-    public function logout(Request $request) {
+
+    /**
+     * Logout for testing (delete the user for next use)
+     */
+    public function testing_logout(Request $request) {
         if (!$request->user()) {
             return response()->json([
                 'error' => 'No user logged in',
                 'code' => 'no_user',
             ], 400);
         }
+
         $request->user()->tokens()->delete();
+        // Delete the user
+        $request->user()->delete();
 
         return response()->json([
+            'success' => true,
             'message' => 'Successfully logged out'
         ]);
     }

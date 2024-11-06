@@ -17,8 +17,9 @@ Route::get('/', function () { abort(404); });
 
 Route::group(['prefix' => 'auth'], function () {
     Route::post('/login',   [AuthController::class, 'login']    )->name('login');
-    Route::post('/testing', [AuthController::class, 'testing']  )->name('testing');
     Route::post('/logout',  [AuthController::class, 'logout']   )->name('logout')->middleware('auth:sanctum');
+    Route::post('/testing', [AuthController::class, 'testing']  )->name('testing');
+    Route::post('/testing-logout', [AuthController::class, 'testing_logout']  )->name('testing');
 });
 
 // Allow creating users without auth when app is in local mode
