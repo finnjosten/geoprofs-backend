@@ -86,4 +86,8 @@ class User extends Authenticatable
     public function sendVerifyEmail() {
         return $this->verified = true;
     }
+
+    public function attendance() {
+        return $this->hasMany(Attendance::class);
+    }
 }
