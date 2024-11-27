@@ -5,8 +5,8 @@
     /**
      * Set meta data for a page
      */
-    if (! function_exists('vlx_set_page_meta')) {
-        function vlx_set_page_meta($custom = null) {
+    if (! function_exists('vlxSetPageMeta')) {
+        function vlxSetPageMeta($custom = null) {
             if ($custom) {
                 echo "<meta name='description' content='$custom'>";
             } else {
@@ -22,8 +22,8 @@
     /**
      * Set meta data for a page that is used by socials
      */
-    if (! function_exists('vlx_set_social_meta')) {
-        function vlx_set_social_meta() {
+    if (! function_exists('vlxSetSocialMeta')) {
+        function vlxSetSocialMeta() {
             echo '
                 <meta property="og:title" content="' . env("APP_NAME") . '">
                 <meta property="og:description" content="'. env("APP_DESCRIPTION") .'">
@@ -45,8 +45,8 @@
     /**
      * Format a string (remove underscores and semicolons)
      */
-    if (! function_exists('vlx_format')) {
-        function vlx_format($string) {
+    if (! function_exists('vlxFormat')) {
+        function vlxFormat($string) {
 
             if(str_contains($string, '_')) { $string = str_replace('_', ' ', $string); }
             if(str_contains($string, ';')) { $string = str_replace(';', '', $string); }
@@ -59,8 +59,8 @@
     /**
      * Format a number
      */
-    if (! function_exists('vlx_number_format')) {
-        function vlx_number_format($input, $decimals){
+    if (! function_exists('vlxNumberFormat')) {
+        function vlxNumberFormat($input, $decimals){
             return number_format($input, $decimals, '.', ',');
         }
     }
@@ -68,8 +68,8 @@
     /**
      * Format a route name
      */
-    if (! function_exists('vlx_format_route_name')) {
-        function vlx_format_route_name($string) {
+    if (! function_exists('vlxFormatRouteName')) {
+        function vlxFormatRouteName($string) {
 
             $string = explode('.', $string)[0];
             $string = str_replace('-', ' ', $string);
@@ -87,8 +87,8 @@
     /**
      * Slugify a string
      */
-    if (! function_exists('vlx_slugify')) {
-        function vlx_slugify($string) {
+    if (! function_exists('vlxSlugify')) {
+        function vlxSlugify($string) {
             return strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $string), '-'));
         }
     }
@@ -96,13 +96,13 @@
     /**
      * Emailfy a name
      */
-    if (! function_exists('vlx_emailfy')) {
-        function vlx_emailfy($name) {
+    if (! function_exists('vlxEmailfy')) {
+        function vlxEmailfy($name) {
 
             $email = strtolower($name);
             $email = str_replace('.', '', $email);
             $email = str_replace(' ', '.', $email);
-            $email = $email . '@' . vlx_get_app_domain();
+            $email = $email . '@' . vlxGetAppDomain();
 
             return $email;
 
@@ -116,8 +116,8 @@
     /**
      * Add a slash at the start of a string
      */
-    if (! function_exists('vlx_start_slash_it')) {
-        function vlx_start_slash_it($string) {
+    if (! function_exists('vlxStartSlashIt')) {
+        function vlxStartSlashIt($string) {
 
             $string = trim($string, '/');
             $string = '/' . $string;
@@ -130,8 +130,8 @@
     /**
      * Add a slash at the end of a string
      */
-    if (!function_exists('vlx_end_slash_it')) {
-        function vlx_end_slash_it($string) {
+    if (!function_exists('vlxEndSlashIt')) {
+        function vlxEndSlashIt($string) {
 
             $string = rtrim($string, '/');
             $string .= '/';
@@ -148,11 +148,11 @@
     /**
      * Get the account url
      */
-    if (! function_exists('vlx_get_account_url')) {
-        function vlx_get_account_url() {
+    if (! function_exists('vlxGetAccountUrl')) {
+        function vlxGetAccountUrl() {
 
             $url = !empty(env('SETTING_ACCOUNT_URL')) ? env('SETTING_ACCOUNT_URL') : 'account';
-            return vlx_start_slash_it($url);
+            return vlxStartSlashIt($url);
 
         }
     }
@@ -160,11 +160,11 @@
     /**
      * Get the admin url
      */
-    if (! function_exists('vlx_get_admin_url')) {
-        function vlx_get_admin_url() {
+    if (! function_exists('vlxGetAdminUrl')) {
+        function vlxGetAdminUrl() {
 
             $url = !empty(env('SETTING_ADMIN_URL')) ? env('SETTING_ADMIN_URL') : 'admin';
-            return vlx_start_slash_it($url);
+            return vlxStartSlashIt($url);
 
         }
     }
@@ -172,11 +172,11 @@
     /**
      * Get the auth url
      */
-    if (! function_exists('vlx_get_auth_url')) {
-        function vlx_get_auth_url() {
+    if (! function_exists('vlxGetAuthUrl')) {
+        function vlxGetAuthUrl() {
 
             $url = !empty(env('SETTING_AUTH_URL')) ? env('SETTING_AUTH_URL') : 'auth';
-            return vlx_start_slash_it($url);
+            return vlxStartSlashIt($url);
 
         }
     }
@@ -186,13 +186,10 @@
 
     // Get paths
     /**
-     * Get the path to the ssh keys folder
+     * Get the path to something
      */
-    if (! function_exists('vlx_get_ssh_key_path')) {
-        function vlx_get_ssh_key_path() {
-
-            $path = env('SSH_KEY_PATH');
-            return $path;
+    if (! function_exists('vlxGetSomethingPath')) {
+        function vlxGetSomethingPath() {
 
         }
     }
@@ -204,8 +201,8 @@
     /**
      * Get the domain of the app
      */
-    if (! function_exists('vlx_get_app_domain')) {
-        function vlx_get_app_domain() {
+    if (! function_exists('vlxGetAppDomain')) {
+        function vlxGetAppDomain() {
 
             $domain = env('APP_DOMAIN');
             $domain = str_replace(['http:', 'https:', '/'], '', $domain);
@@ -222,8 +219,8 @@
     /**
      * Get a string from the ENV file (unless it contains a "KEY", "API", "USERNAME", "PASS")
      */
-    if (! function_exists('vlx_get_env_string')) {
-        function vlx_get_env_string($env_key) {
+    if (! function_exists('vlxGetEnvString')) {
+        function vlxGetEnvString($env_key) {
 
             //if(str_contains($env_key, 'KEY')) return null;
             if(str_contains($env_key, 'API')) return null;
@@ -231,7 +228,7 @@
             if(str_contains($env_key, 'PASS')) return null;
 
             $string = env($env_key);
-            $string = vlx_format($string);
+            $string = vlxFormat($string);
 
             return $string;
         }
@@ -244,8 +241,8 @@
     /**
      * Check if string is error
      */
-    if (! function_exists('vlx_error')) {
-        function vlx_error($str) {
+    if (! function_exists('vlxIsError')) {
+        function vlxIsError($str) {
             if (is_string($str) && str_starts_with($str, 'error:')) {
                 return true;
             }
@@ -261,8 +258,8 @@
      * Create a UUID (Universally Unique Identifier)
      * @deprecated
      */
-    if (! function_exists('vlx_make_uuid')) {
-        function vlx_make_uuid() {
+    if (! function_exists('vlxMakeUuid')) {
+        function vlxMakeUuid() {
             // Generate 16 bytes (128 bits) of random data or use the data passed into the function.
             $data = random_bytes(16);
             assert(strlen($data) == 16);

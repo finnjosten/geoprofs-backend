@@ -7,6 +7,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AgendaController;
 
 /* Route::get('/user', function (Request $request) {
     return $request->user();
@@ -28,3 +29,6 @@ Route::get      ('users/',                  [UserController::class, 'index']    
 Route::get      ('users/{id}',              [UserController::class, 'show']         )->name('users.show')->middleware('auth:sanctum');
 Route::post     ('users/{id}/update',       [UserController::class, 'update']       )->name('users.update')->middleware('auth:sanctum');
 Route::delete   ('users/{id}/delete',       [UserController::class, 'destroy']      )->name('users.delete')->middleware('auth:sanctum');
+
+Route::post     ('agenda/save',             [AgendaController::class, 'store']      )->name('agenda.save')->middleware('auth:sanctum');
+Route::get      ('agenda/{deparment:slug?}',  [AgendaController::class, 'show']       )->name('agenda.show')->middleware('auth:sanctum');

@@ -9,8 +9,15 @@ class Week extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['week_number', 'year_id'];
+
     public function days()
     {
         return $this->hasMany(Day::class);
+    }
+
+    public function year()
+    {
+        return $this->belongsTo(Year::class);
     }
 }

@@ -9,6 +9,8 @@ class Day extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['date', 'week_id'];
+
     public function week()
     {
         return $this->belongsTo(Week::class);
