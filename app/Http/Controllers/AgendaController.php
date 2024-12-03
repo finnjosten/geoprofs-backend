@@ -75,8 +75,11 @@ class AgendaController extends Controller
     /**
      * Retrieve the current agenda
      */
-    public function show(Department $department = null)
+    public function show($department = null)
     {
+
+        $department = Department::where('slug', $department)->first();
+
         $agenda = [];
 
         $years = Year::with(['weeks.days.attendance.user'])->get(); // Eager load related data
@@ -94,6 +97,11 @@ class AgendaController extends Controller
 
                     $dayData = [];
                     foreach ($day->attendance as $attendance) {
+
+                        if ($department && $attendance->user->department_slug !== $department->slug) {
+                            continue;
+                        }
+
                         $dayData[$attendance->user_id] = [
                             'morning' => $attendance->morning,
                             'afternoon' => $attendance->afternoon,
@@ -126,5 +134,33 @@ class AgendaController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function generate() {
+        // get the last 3 years,
+        // loop over every week
+        // loop over every day
+        // and save all those years, weeks and days in he db
+
+
+        $years = [];
+        for ($i = 0; $i < 3; $i++) {
+            $years[] = date('Y', strtotime("-$i year"));
+        }
+
+        foreach ($years as $year) {
+            for ($week = 1; $week <= 52; $week++) {
+                for ($day = 1; $day <= 7; $day++) {
+                    dd($year, $week, $day);
+                    $date = date('Y-m-d', strtotime("$year-W$week-$day"));
+
+                    dd($date);
+
+                    $db_year = Year::firstOrCreate(['year_number' => $year]);
+                    $db_week = Week::firstOrCreate(['week_number' => $week, 'year_id' => $db_year->id]);
+                    $db_day = Day::firstOrCreate(['date' => $date, 'week_id' => $db_week->id]);
+                }
+            }
+        }
     }
 }
