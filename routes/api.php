@@ -19,11 +19,13 @@ Route::get('/', function () { abort(404); });
 Route::group(['prefix' => 'auth'], function () {
     Route::post('/login',   [AuthController::class, 'login']    )->name('login');
     Route::post('/logout',  [AuthController::class, 'logout']   )->name('logout')->middleware('auth:sanctum');
+    Route::post('/testing', [AuthController::class, 'testing']  )->name('testing');
+    Route::post('/testing-logout', [AuthController::class, 'testing_logout']  )->name('testing');
 });
 
 // Allow creating users without auth when app is in local mode
-if (env('APP_ENV') == 'local') Route::post('users/create',[UserController::class, 'store'])->name('users.create');
-if (env('APP_ENV') != 'local') Route::post('users/create',[UserController::class, 'store'])->name('users.create')->middleware('auth:sanctum');
+Route::post('users/create',[UserController::class, 'store'])->name('users.create');
+if (env('APP_ENV') == 'production') Route::post('users/create',[UserController::class, 'store'])->name('users.create')->middleware('auth:sanctum');
 Route::get      ('user/',                           [UserController::class, 'showCurrent']  )->name('users.index')->middleware('auth:sanctum');
 Route::get      ('users/',                          [UserController::class, 'index']        )->name('users.index')->middleware('auth:sanctum');
 Route::get      ('users/{id}',                      [UserController::class, 'show']         )->name('users.show')->middleware('auth:sanctum');

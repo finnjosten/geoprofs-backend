@@ -36,6 +36,7 @@ class UserController extends Controller {
         'personal_days',
         'max_vac_days'
     );
+
     private $validator_fields = array(
         'email' => 'required|email|unique:users,email',
         'password' => 'required|string|min:8|max:64',
@@ -64,11 +65,38 @@ class UserController extends Controller {
      */
     public function index() {
         $users = User::all();
-        return response()->json(["data" => $users]);
+
+        if (!$users) {
+            return response()->json([
+                'message' => 'No users found!',
+                'code' => 'no_users_found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            "data" => $users,
+        ]);
     }
 
     /**
      * Store a newly created user.
+     * @bodyParam email                 email of the user.              Example: john@geoprofs.com
+     * @bodyParam password              password of the user.           Example: password1
+     * @bodyParam role_slug             slug of the role.               Example: medewerker
+     * @bodyParam department_slug       slug of the department          Example: geoict
+     * @bodyParam subdepartment_slug    slug of the subdepartment       Example: scanning
+     * @bodyParam supervisor_id         user id of the supervisor       Example: 1
+     * @bodyParam blocked               true/false if user is blocked   Example: false
+     * @bodyParam verified              true/false if user is verified  Example: true
+     * @bodyParam first_name            first name of the user          Example: John
+     * @bodyParam sure_name             sure name of the user           Example: Doe
+     * @bodyParam bsn                   BSN of the user                 Example: 123456789
+     * @bodyParam date_of_service       Date of when the user started   Example: 2021-01-01
+     * @bodyParam sick_days             ammount of sick days used       Example: 0
+     * @bodyParam vac_days              ammount of vacation days used   Example: 0
+     * @bodyParam personal_days         ammount of personal days used   Example: 0
+     * @bodyParam max_vac_days          max ammount of leave days       Example: 30
      */
     public function store(Request $request) {
 
@@ -82,6 +110,7 @@ class UserController extends Controller {
             // Return a JSON response with validation errors
             return response()->json([
                 'errors' => $validator->errors(),
+                'code' => 'validation_error',
             ], 422);
         }
 
@@ -112,6 +141,7 @@ class UserController extends Controller {
 
         // Return a success response
         return response()->json([
+            'success' => true,
             'message' => 'User registered successfully!',
             'user' => $user,
         ]);
@@ -119,20 +149,53 @@ class UserController extends Controller {
 
     /**
      * Display the specified user.
+     * @urlParam id required The ID of the user. Example: 2
      */
     public function show($user_id) {
-        return response()->json(["data" => User::whereId($user_id)->first()]);
+
+        $user = User::whereId($user_id)->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found!',
+                'code' => 'user_not_found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            "data" => $user,
+        ]);
     }
 
     /**
      * Display the current user.
      */
     public function showCurrent(Request $request) {
-        return response()->json(["data" => $request->user()]);
+        return response()->json([
+            'success' => true,
+            "data" => $request->user()
+        ]);
     }
 
     /**
      * Update the specified user.
+     * @urlParam id required The ID of the user. Example: 2
+     * @bodyParam email                 email of the user.              Example: john@geoprofs.com | null
+     * @bodyParam role_slug             slug of the role.               Example: medewerker | null
+     * @bodyParam department_slug       slug of the department          Example: geoict | null
+     * @bodyParam subdepartment_slug    slug of the subdepartment       Example: scanning | null
+     * @bodyParam supervisor_id         user id of the supervisor       Example: 1 | null
+     * @bodyParam blocked               true/false if user is blocked   Example: false | null
+     * @bodyParam verified              true/false if user is verified  Example: true | null
+     * @bodyParam first_name            first name of the user          Example: John | null
+     * @bodyParam sure_name             sure name of the user           Example: Doe | null
+     * @bodyParam bsn                   BSN of the user                 Example: 123456789 | null
+     * @bodyParam date_of_service       Date of when the user started   Example: 2021-01-01 | null
+     * @bodyParam sick_days             ammount of sick days used       Example: 0 | null
+     * @bodyParam vac_days              ammount of vacation days used   Example: 0 | null
+     * @bodyParam personal_days         ammount of personal days used   Example: 0 | null
+     * @bodyParam max_vac_days          max ammount of leave days       Example: 30 | null
      */
     public function update(Request $request, $user_id) {
 
@@ -146,6 +209,7 @@ class UserController extends Controller {
             // Return a JSON response with validation errors
             return response()->json([
                 'errors' => $validator->errors(),
+                'code' => 'validation_error',
             ], 422);
         }
 
@@ -178,6 +242,7 @@ class UserController extends Controller {
 
         // Return a success response
         return response()->json([
+            'success' => true,
             'message' => 'User updated successfully!',
             'user' => $user,
         ]);
@@ -185,6 +250,7 @@ class UserController extends Controller {
 
     /**
      * Remove the specified user.
+     * @urlParam id required The ID of the user. Example: 2
      */
     public function destroy($user_id) {
 
@@ -193,6 +259,7 @@ class UserController extends Controller {
         if (!$user) {
             return response()->json([
                 'message' => 'User not found!',
+                'code' => 'user_not_found',
             ], 404);
         }
 
@@ -200,6 +267,7 @@ class UserController extends Controller {
         $user->delete();
 
         return response()->json([
+            'success' => true,
             'message' => 'User deleted successfully!',
         ]);
 
