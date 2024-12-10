@@ -32,6 +32,7 @@ Route::get      ('users/{id}',                      [UserController::class, 'sho
 Route::post     ('users/{id}/update',               [UserController::class, 'update']       )->name('users.update')->middleware('auth:sanctum');
 Route::delete   ('users/{id}/delete',               [UserController::class, 'destroy']      )->name('users.delete')->middleware('auth:sanctum');
 
-Route::post     ('agenda/save',                     [AgendaController::class, 'store']      )->name('agenda.save')->middleware('auth:sanctum');
-Route::get      ('agenda/get/{deparment:slug?}',    [AgendaController::class, 'show']       )->name('agenda.show')->middleware('auth:sanctum');
+Route::post     ('agenda/create',                   [AgendaController::class, 'store']      )->name('agenda.save')->middleware('auth:sanctum');
+Route::post     ('agenda/{id}/update',              [AgendaController::class, 'update']      )->name('agenda.update')->middleware('auth:sanctum');
+Route::get      ('agenda/get/{slug?}',              [AgendaController::class, 'show']       )->name('agenda.show')->middleware('auth:sanctum');
 Route::get      ('agenda/generate',                 [AgendaController::class, 'generate']   )->name('agenda.generate')->middleware('auth:sanctum');

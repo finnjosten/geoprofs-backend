@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('weeks', function (Blueprint $table) {
             $table->id();
-            $table->integer('week_number')->unique();
+            $table->integer('week_number');
             $table->foreignId('year_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });

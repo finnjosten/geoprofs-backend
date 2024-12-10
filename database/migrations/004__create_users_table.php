@@ -27,7 +27,7 @@ return new class extends Migration
             $table->foreign('department_slug')->references('slug')->on('departments');
 
             $table->string('subdepartment_slug')->nullable();
-            $table->foreign('subdepartment_slug')->references('slug')->on('sub_departments');
+            $table->foreign('subdepartment_slug')->references('slug')->on('subdepartments');
 
             $table->foreignId('supervisor_id')->nullable()->constrained('users', 'id');
 
