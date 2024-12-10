@@ -7,7 +7,7 @@
      */
     if (! function_exists('vlx_set_page_meta')) {
         function vlx_set_page_meta($custom = null) {
-            global $site;
+          
             if ($custom) {
                 echo "<meta name='description' content='$custom'>";
             } else {
@@ -18,6 +18,7 @@
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <meta http-equiv="X-UA-Compatible" content="ie=edge">
             ';
+          
         }
     }
     /**
