@@ -7,6 +7,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AgendaController;
 
 /* Route::get('/user', function (Request $request) {
     return $request->user();
@@ -25,8 +26,12 @@ Route::group(['prefix' => 'auth'], function () {
 // Allow creating users without auth when app is in local mode
 Route::post('users/create',[UserController::class, 'store'])->name('users.create');
 if (env('APP_ENV') == 'production') Route::post('users/create',[UserController::class, 'store'])->name('users.create')->middleware('auth:sanctum');
-Route::get      ('user/',                   [UserController::class, 'showCurrent']  )->name('users.index')->middleware('auth:sanctum');
-Route::get      ('users/',                  [UserController::class, 'index']        )->name('users.index')->middleware('auth:sanctum');
-Route::get      ('users/{id}',              [UserController::class, 'show']         )->name('users.show')->middleware('auth:sanctum');
-Route::post     ('users/{id}/update',       [UserController::class, 'update']       )->name('users.update')->middleware('auth:sanctum');
-Route::delete   ('users/{id}/delete',       [UserController::class, 'destroy']      )->name('users.delete')->middleware('auth:sanctum');
+Route::get      ('user/',                           [UserController::class, 'showCurrent']  )->name('users.index')->middleware('auth:sanctum');
+Route::get      ('users/',                          [UserController::class, 'index']        )->name('users.index')->middleware('auth:sanctum');
+Route::get      ('users/{id}',                      [UserController::class, 'show']         )->name('users.show')->middleware('auth:sanctum');
+Route::post     ('users/{id}/update',               [UserController::class, 'update']       )->name('users.update')->middleware('auth:sanctum');
+Route::delete   ('users/{id}/delete',               [UserController::class, 'destroy']      )->name('users.delete')->middleware('auth:sanctum');
+
+Route::post     ('agenda/save',                     [AgendaController::class, 'store']      )->name('agenda.save')->middleware('auth:sanctum');
+Route::get      ('agenda/get/{deparment:slug?}',    [AgendaController::class, 'show']       )->name('agenda.show')->middleware('auth:sanctum');
+Route::get      ('agenda/generate',                 [AgendaController::class, 'generate']   )->name('agenda.generate')->middleware('auth:sanctum');
