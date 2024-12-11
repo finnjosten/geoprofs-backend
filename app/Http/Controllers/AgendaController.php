@@ -7,7 +7,7 @@ use App\Models\Year;
 use App\Models\Week;
 use App\Models\Day;
 use App\Models\Attendance;
-
+use App\Models\Subdepartment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -48,92 +48,181 @@ class AgendaController extends Controller
             ], 422);
         }
 
-        // get the week number from the date()
-        $weekNumber = date('W', strtotime($request->date));
+        try {
+            // get the week number from the date()
+            $weekNumber = date('W', strtotime($request->date));
 
-        $year = Year::firstOrCreate(['year_number' => date('Y', strtotime($request->date))]);
-        $week = Week::firstOrCreate(['week_number' => $weekNumber, 'year_id' => $year->id]);
-        $day = Day::firstOrCreate(['date' => $request->date, 'week_id' => $week->id]);
+            $year = Year::firstOrCreate(['year_number' => date('Y', strtotime($request->date))]);
+            $week = Week::firstOrCreate(['week_number' => $weekNumber, 'year_id' => $year->id]);
+            $day = Day::firstOrCreate(['date' => $request->date, 'week_id' => $week->id]);
 
-        Attendance::updateOrCreate(
-            [
-                'day_id' => $day->id,
-                'user_id' => $request->user_id
-            ],
-            [
-                'morning' => $request->morning ?? 0, // Default to 0 if not provided
-                'afternoon' => $request->afternoon ?? 0, // Default to 0 if not provided
-            ]
-        );
+            $attendance = Attendance::updateOrCreate(
+                [
+                    'day_id' => $day->id,
+                    'user_id' => $request->user_id
+                ],
+                [
+                    'morning' => $request->morning ?? 0, // Default to 0 if not provided
+                    'afternoon' => $request->afternoon ?? 0, // Default to 0 if not provided
+                ]
+            );
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'code' => 'error',
+            ], 500);
+        }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Attendance updated successfully'
+            'message' => 'Attendance updated successfully',
+            'attendance' => $attendance,
         ]);
     }
 
     /**
      * Retrieve the current agenda
      */
-    public function show($department = null)
-    {
+    public function show($slug = null) {
 
-        $department = Department::where('slug', $department)->first();
+        try {
 
-        $agenda = [];
+            // Get the department or subdepartment if the slug is filled
+            $department = null;
 
-        $years = Year::with(['weeks.days.attendance.user'])->get(); // Eager load related data
+            if (!empty($slug)) {
+                $department = Department::where('slug', $slug)->first();
+                if (!$department) $department = Subdepartment::where('slug', $slug)->first();
+            }
 
-        foreach ($years as $year) {
+            // Create an empty array to store the agenda
+            $agenda = [];
 
-            $yearData = [];
-            $year->weeks = $year->weeks->sortBy('week_number');
+            // Get all the years
+            $years = Year::with(['weeks.days.attendance.user'])->get(); // Eager load related data
 
-            foreach ($year->weeks as $week) {
+            // Go over all the years we have
+            foreach ($years as $year) {
 
-                $weekData = [];
-                $week->days = $week->days->sortBy('date');
-                foreach ($week->days as $day) {
+                $yearData = [];
+                // Get all the weeks of that year
+                $year->weeks = $year->weeks->sortBy('week_number');
 
-                    $dayData = [];
-                    foreach ($day->attendance as $attendance) {
+                foreach ($year->weeks as $week) {
 
-                        if ($department && $attendance->user->department_slug !== $department->slug) {
-                            continue;
+                    $weekData = [];
+                    // Get all the days/dates of that week
+                    $week->days = $week->days->sortBy('date');
+                    foreach ($week->days as $day) {
+
+                        $dayData = [];
+                        // Go over all the atendances of that day
+                        foreach ($day->attendance as $attendance) {
+
+                            // if the department is set, check if the user is in that department if not continue
+                            if ( $department && (
+                                    $attendance->user->department_slug !== $department->slug ||
+                                    $attendance->user->sub_department_slug !== $department->sub_department_slug
+                                )) {
+                                continue;
+                            }
+
+                            // save the data to the agenda
+                            $dayData[$attendance->user_id] = [
+                                'morning' => $attendance->morning,
+                                'afternoon' => $attendance->afternoon,
+                            ];
                         }
+                        $weekData[$day->date] = $dayData;
 
-                        $dayData[$attendance->user_id] = [
-                            'morning' => $attendance->morning,
-                            'afternoon' => $attendance->afternoon,
-                        ];
                     }
-                    $weekData[$day->date] = $dayData;
+                    $yearData[$week->week_number] = $weekData;
 
                 }
-                $yearData[$week->week_number] = $weekData;
+                $agenda[$year->year_number] = $yearData;
 
             }
-            $agenda[$year->year_number] = $yearData;
 
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'code' => 'error',
+            ], 500);
         }
 
-        return response()->json($agenda);
+        return response()->json([
+            'status' => 'success',
+            'agenda' => $agenda,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    public function update(Request $request, string $id) {
+        $data = $request->only('user_id', 'week_number', 'date', 'morning', 'afternoon');
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $validator = Validator::make($data, [
+            'user_id' => 'required|integer|exists:users,id',
+            'date' => 'nullable|date',
+            // 0 = aanwezig, 1 = ziek, 2 = vakantie, 3 = verlof, 4 = onbetaald verlof, 5 = feestdag
+            'morning' => 'nullable|integer|min:0|max:5',
+            // 0 = aanwezig, 1 = ziek, 2 = vakantie, 3 = verlof, 4 = onbetaald verlof, 5 = feestdag
+            'afternoon' => 'nullable|integer|min:0|max:5',
+        ]);
+
+        // Check if the validation fails
+        if ($validator->fails()) {
+            // Return a JSON response with validation errors
+            return response()->json([
+                'error' => $validator->errors(),
+                'code' => 'validation_error',
+            ], 422);
+        }
+
+        $attendance = Attendance::find($id);
+
+        if (!$attendance) {
+            return response()->json([
+                'error' => 'Attendance not found',
+                'code' => 'not_found',
+            ], 404);
+        }
+
+        try {
+
+            $attendance->update([
+                'morning' => $request->morning ?? 0, // Default to 0 if not provided
+                'afternoon' => $request->afternoon ?? 0, // Default to 0 if not provided
+            ]);
+
+            // update the date if needed
+
+            if ($request->date) {
+                $weekNumber = date('W', strtotime($request->date));
+
+                $year = Year::firstOrCreate(['year_number' => date('Y', strtotime($request->date))]);
+                $week = Week::firstOrCreate(['week_number' => $weekNumber, 'year_id' => $year->id]);
+                $day = Day::firstOrCreate(['date' => $request->date, 'week_id' => $week->id]);
+
+                $attendance->update([
+                    'day_id' => $day->id,
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'code' => 'error',
+            ], 500);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Attendance updated successfully'
+        ]);
+
+
     }
 
     public function generate() {
@@ -142,25 +231,47 @@ class AgendaController extends Controller
         // loop over every day
         // and save all those years, weeks and days in he db
 
+        try {
 
-        $years = [];
-        for ($i = 0; $i < 3; $i++) {
-            $years[] = date('Y', strtotime("-$i year"));
-        }
-
-        foreach ($years as $year) {
-            for ($week = 1; $week <= 52; $week++) {
-                for ($day = 1; $day <= 7; $day++) {
-                    dd($year, $week, $day);
-                    $date = date('Y-m-d', strtotime("$year-W$week-$day"));
-
-                    dd($date);
-
-                    $db_year = Year::firstOrCreate(['year_number' => $year]);
-                    $db_week = Week::firstOrCreate(['week_number' => $week, 'year_id' => $db_year->id]);
-                    $db_day = Day::firstOrCreate(['date' => $date, 'week_id' => $db_week->id]);
-                }
+            $years = [];
+            for ($i = 0; $i < 3; $i++) {
+                $years[] = date('Y', strtotime("-$i year"));
             }
+
+            foreach ($years as $year) {
+
+                $db_year = Year::firstOrCreate(['year_number' => $year]);
+
+                // loop over all the months in that year
+                for ($month = 1; $month <= 12; $month++) {
+
+                    // get the total amount of days for that month
+                    $days = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+
+                    // loop over all the days in that month
+                    for ($day = 1; $day <= $days; $day++) {
+                        $date = date('Y-m-d', strtotime("$year-$month-$day"));
+
+                        // check if date is already present in the db
+                        if (Day::where('date', $date)->exists()) {
+                            continue;
+                        }
+
+                        $week = date('W', strtotime($date));
+
+                        $db_week = Week::firstOrCreate(['week_number' => $week, 'year_id' => $db_year->id]);
+                        $db_day = Day::firstOrCreate(['date' => $date, 'week_id' => $db_week->id]);
+                    }
+                }
+
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'code' => 'error',
+            ], 500);
         }
+
     }
 }
