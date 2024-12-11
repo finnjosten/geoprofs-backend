@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sub_departments', function (Blueprint $table) {
+        Schema::create('weeks', function (Blueprint $table) {
             $table->id();
-            $table->string('slug')->unique();
-            $table->string('name');
-            $table->string('department_slug');
-            $table->foreign('department_slug')->references('slug')->on('departments');
+            $table->integer('week_number');
+            $table->foreignId('year_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sub_departments');
+        Schema::dropIfExists('weeks');
     }
 };

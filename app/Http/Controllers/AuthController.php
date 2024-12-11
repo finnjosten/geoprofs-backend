@@ -69,6 +69,7 @@ class AuthController extends Controller {
         $token = $user->createToken('authToken', ['*'], now()->addDay())->plainTextToken;
 
         return response()->json([
+            'success' => true,
             'access_token' => $token,
             'token_type' => 'Bearer',
         ]);
@@ -84,6 +85,73 @@ class AuthController extends Controller {
         $request->user()->tokens()->delete();
 
         return response()->json([
+            'success' => true,
+            'message' => 'Successfully logged out'
+        ]);
+    }
+
+
+    /**
+     * Login for testing (create a user and return the token + user)
+     */
+    public function testing(Request $request) {
+        $data = $request->only('testing_key');
+
+        if (env('APP_ENV') != 'testing') {
+            return response()->json([
+                'error' => 'Not in testing environment',
+                'code' => 'not_testing',
+            ], 400);
+        }
+
+        if (!isset($data['testing_key']) || empty($data['testing_key'])) {
+            return response()->json([
+                'error' => 'No testing key provided',
+                'code' => 'no_key',
+            ], 400);
+        }
+
+        // Make sure not everyone can just get an testing token
+        if ($data['testing_key'] != 'MKfUKBND9s901CkR2aj5MIagDlM7jXAl') {
+            return response()->json([
+                'error' => 'Invalid testing key',
+                'code' => 'invalid_key',
+            ], 400);
+        }
+
+        $user = User::where('email', 'testing-user@app.com')->first();
+        if (!$user) {
+            $user = User::factory()->create(["email"=>"testing-user@app.com"]);
+        }
+
+        $token = $user->createToken('authToken', ['*'], now()->addDay())->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+        ]);
+    }
+
+
+    /**
+     * Logout for testing (delete the user for next use)
+     */
+    public function testing_logout(Request $request) {
+        if (!$request->user()) {
+            return response()->json([
+                'error' => 'No user logged in',
+                'code' => 'no_user',
+            ], 400);
+        }
+
+        $request->user()->tokens()->delete();
+        // Delete the user
+        $request->user()->delete();
+
+        return response()->json([
+            'success' => true,
             'message' => 'Successfully logged out'
         ]);
     }
