@@ -36,6 +36,7 @@ class UserController extends Controller {
         'personal_days',
         'max_vac_days'
     );
+
     private $validator_fields = array(
         'email' => 'required|email|unique:users,email',
         'password' => 'required|string|min:8|max:64',
@@ -64,9 +65,18 @@ class UserController extends Controller {
      */
     public function index() {
         $users = User::all();
+
+        if (!$users) {
+            return response()->json([
+                'error' => 'No user found',
+                'message' => 'No users found!',
+                'code' => 'no_users_found',
+            ], 404);
+        }
+
         return response()->json([
-            "success" => true,
-            "users" => $users
+            'success' => true,
+            "data" => $users,
         ]);
     }
 
@@ -103,6 +113,7 @@ class UserController extends Controller {
                 "error" => "Validation error",
                 "code" => "validation_error",
                 'errors' => $validator->errors(),
+                'code' => 'validation_error',
             ], 422);
         }
 
@@ -134,7 +145,6 @@ class UserController extends Controller {
         // Return a success response
         return response()->json([
             'success' => true,
-            'message' => 'User registered successfully!',
             'user' => $user,
         ]);
     }
@@ -165,7 +175,6 @@ class UserController extends Controller {
      * Display the current user.
      */
     public function showCurrent(Request $request) {
-
         $user = $request->user();
 
         if (!$user) {
@@ -215,6 +224,7 @@ class UserController extends Controller {
                 'error' => "Validation error",
                 'code' => 'validation_error',
                 'errors' => $validator->errors(),
+                'code' => 'validation_error',
             ], 422);
         }
 

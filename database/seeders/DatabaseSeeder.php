@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Department;
-use App\Models\SubDepartment;
+use App\Models\Subdepartment;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -49,20 +49,20 @@ class DatabaseSeeder extends Seeder
             'slug' => 'geoict',
         ]);
 
-        // GeoICT SubDepartments
-        SubDepartment::factory()->create([
+        // GeoICT Subdepartments
+        Subdepartment::factory()->create([
             'name' => 'Development',
             'slug' => 'development',
             'department_slug' => 'geoict',
         ]);
 
-        SubDepartment::factory()->create([
+        Subdepartment::factory()->create([
             'name' => 'Scanning',
             'slug' => 'scanning',
             'department_slug' => 'geoict',
         ]);
 
-        SubDepartment::factory()->create([
+        Subdepartment::factory()->create([
             'name' => 'Processing',
             'slug' => 'processing',
             'department_slug' => 'geoict',
@@ -74,20 +74,20 @@ class DatabaseSeeder extends Seeder
             'slug' => 'geodesy',
         ]);
 
-        // Geodesy SubDepartments
-        SubDepartment::factory()->create([
+        // Geodesy Subdepartments
+        Subdepartment::factory()->create([
             'name' => 'Preparation',
             'slug' => 'preparation',
             'department_slug' => 'geodesy',
         ]);
 
-        SubDepartment::factory()->create([
+        Subdepartment::factory()->create([
             'name' => 'Measuring',
             'slug' => 'measuring',
             'department_slug' => 'geodesy',
         ]);
 
-        SubDepartment::factory()->create([
+        Subdepartment::factory()->create([
             'name' => 'Document',
             'slug' => 'document',
             'department_slug' => 'geodesy',

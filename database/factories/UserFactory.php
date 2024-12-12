@@ -42,13 +42,11 @@ class UserFactory extends Factory
             $role_slug = fake()->randomElement(['medewerker', 'medewerker', 'medewerker', 'sub-manager']);
         } else if ($subdepartment_slug == null) {
             $role_slug = "manager";
-        } else {
-            $supervisor_id = null;
         }
 
         return [
             'email' => fake()->unique()->safeEmail(),
-            'password' => static::$password ??= bcrypt('password'),
+            'password' => bcrypt('password'),
 
             'role_slug' => $role_slug,
             'department_slug' => $department_slug,

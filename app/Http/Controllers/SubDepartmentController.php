@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SubDepartment;
-use App\Http\Requests\StoreSubDepartmentRequest;
-use App\Http\Requests\UpdateSubDepartmentRequest;
+use App\Models\Subdepartment;
+use App\Http\Requests\StoreSubdepartmentRequest;
+use App\Http\Requests\UpdateSubdepartmentRequest;
 
-class SubDepartmentController extends Controller {
+class SubdepartmentController extends Controller {
 
     /**
      * Display a listing of the resource.
      */
     public function index() {
-        return response()->json(["data" => SubDepartment::all()]);
+        return response()->json(["data" => Subdepartment::all()]);
     }
 
     /**
@@ -25,35 +25,35 @@ class SubDepartmentController extends Controller {
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSubDepartmentRequest $request) {
+    public function store(StoreSubdepartmentRequest $request) {
         //
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(SubDepartment $subDepartment) {
+    public function show(Subdepartment $Subdepartment) {
         //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(SubDepartment $subDepartment) {
+    public function edit(Subdepartment $Subdepartment) {
         //
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSubDepartmentRequest $request, SubDepartment $subDepartment) {
+    public function update(UpdateSubdepartmentRequest $request, Subdepartment $Subdepartment) {
         //
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(SubDepartment $subDepartment) {
+    public function destroy(Subdepartment $Subdepartment) {
         //
     }
 }
