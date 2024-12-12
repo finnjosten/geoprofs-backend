@@ -64,7 +64,10 @@ class UserController extends Controller {
      */
     public function index() {
         $users = User::all();
-        return response()->json(["data" => $users]);
+        return response()->json([
+            "success" => true,
+            "users" => $users
+        ]);
     }
 
     /**
@@ -97,6 +100,8 @@ class UserController extends Controller {
         if ($validator->fails()) {
             // Return a JSON response with validation errors
             return response()->json([
+                "error" => "Validation error",
+                "code" => "validation_error",
                 'errors' => $validator->errors(),
             ], 422);
         }
@@ -128,6 +133,7 @@ class UserController extends Controller {
 
         // Return a success response
         return response()->json([
+            'success' => true,
             'message' => 'User registered successfully!',
             'user' => $user,
         ]);
@@ -138,14 +144,42 @@ class UserController extends Controller {
      * @urlParam id required The ID of the user. Example: 2
      */
     public function show($user_id) {
-        return response()->json(["data" => User::whereId($user_id)->first()]);
+
+        $user = User::whereId($user_id)->first();
+
+        if (!$user) {
+            return response()->json([
+                'error' => "User not found",
+                'code' => 'user_not_found',
+                'message' => 'User not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'user' => $user,
+        ]);
     }
 
     /**
      * Display the current user.
      */
     public function showCurrent(Request $request) {
-        return response()->json(["data" => $request->user()]);
+
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'error' => "User not found",
+                'code' => 'user_not_found',
+                'message' => 'User not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'user' => $user,
+        ]);
     }
 
     /**
@@ -178,6 +212,8 @@ class UserController extends Controller {
         if ($validator->fails()) {
             // Return a JSON response with validation errors
             return response()->json([
+                'error' => "Validation error",
+                'code' => 'validation_error',
                 'errors' => $validator->errors(),
             ], 422);
         }
@@ -211,7 +247,7 @@ class UserController extends Controller {
 
         // Return a success response
         return response()->json([
-            'message' => 'User updated successfully!',
+            'success' => true,
             'user' => $user,
         ]);
     }
@@ -220,13 +256,23 @@ class UserController extends Controller {
      * Remove the specified user.
      * @urlParam id required The ID of the user. Example: 2
      */
-    public function destroy($user_id) {
+    public function destroy(Request $request, $user_id) {
+
+        if ($user_id == $request->user()->id) {
+            return response()->json([
+                'error' => "Self delete",
+                'code' => 'self_delete',
+                'message' => 'You cannot delete yourself!',
+            ], 403);
+        }
 
         $user = User::whereId($user_id)->first();
 
         if (!$user) {
             return response()->json([
-                'message' => 'User not found!',
+                'error' => "User not found",
+                'code' => 'user_not_found',
+                'message' => 'User not found',
             ], 404);
         }
 
@@ -234,6 +280,7 @@ class UserController extends Controller {
         $user->delete();
 
         return response()->json([
+            'success' => true,
             'message' => 'User deleted successfully!',
         ]);
 
