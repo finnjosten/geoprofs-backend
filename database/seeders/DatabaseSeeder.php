@@ -116,6 +116,11 @@ class DatabaseSeeder extends Seeder
 
 
 
-        User::factory(5)->create();
+        $users = unserialize(env('USER_DATA', 'a:0:{}'));
+
+        foreach ($users as $user) {
+            User::factory()->create($user);
+        }
+
     }
 }
