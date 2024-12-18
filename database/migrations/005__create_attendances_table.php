@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users');
             $table->integer('morning')->default(0);
             $table->integer('afternoon')->default(0);
+            $table->string('attendance_reason')->nullable();
+            $table->string('attendance_status')->default('pending');
             $table->timestamps();
         });
     }

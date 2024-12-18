@@ -52,7 +52,7 @@ class AuthController extends Controller {
             ], 401);
         }
 
-        if ($user->isVerified()) {
+        if (!$user->isVerified()) {
             $user->sendVerifyEmail();
             return response()->json([
                 'error' => 'User needs verification',
