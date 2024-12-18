@@ -84,7 +84,9 @@ class User extends Authenticatable
     }
 
     public function sendVerifyEmail() {
-        return $this->verified = true;
+        $this->verified = true;
+        $this->save();
+        return;
     }
 
     public function attendance() {
