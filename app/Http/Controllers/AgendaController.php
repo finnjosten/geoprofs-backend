@@ -21,66 +21,6 @@ class AgendaController extends Controller
 {
 
     /**
-     * Store the new attendance
-     */
-    public function store(Request $request) {
-
-        $data = $request->only('user_id', 'week_number', 'date', 'morning', 'afternoon');
-
-        $validator = Validator::make($data, [
-            'user_id' => 'required|integer|exists:users,id',
-            'date' => 'required|date',
-            // 0 = aanwezig, 1 = ziek, 2 = vakantie, 3 = verlof, 4 = onbetaald verlof, 5 = feestdag
-            'morning' => 'nullable|integer|min:0|max:5',
-            // 0 = aanwezig, 1 = ziek, 2 = vakantie, 3 = verlof, 4 = onbetaald verlof, 5 = feestdag
-            'afternoon' => 'nullable|integer|min:0|max:5',
-        ]);
-
-        // strip the time of the date
-        $request->merge(['date' => date('Y-m-d', strtotime($request->date))]);
-
-        // Check if the validation fails
-        if ($validator->fails()) {
-            // Return a JSON response with validation errors
-            return response()->json([
-                'error' => $validator->errors(),
-                'code' => 'validation_error',
-            ], 422);
-        }
-
-        try {
-            // get the week number from the date()
-            $weekNumber = date('W', strtotime($request->date));
-
-            $year = Year::firstOrCreate(['year_number' => date('Y', strtotime($request->date))]);
-            $week = Week::firstOrCreate(['week_number' => $weekNumber, 'year_id' => $year->id]);
-            $day = Day::firstOrCreate(['date' => $request->date, 'week_id' => $week->id]);
-
-            $attendance = Attendance::updateOrCreate(
-                [
-                    'day_id' => $day->id,
-                    'user_id' => $request->user_id
-                ],
-                [
-                    'morning' => $request->morning ?? 0, // Default to 0 if not provided
-                    'afternoon' => $request->afternoon ?? 0, // Default to 0 if not provided
-                ]
-            );
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage(),
-                'code' => 'error',
-            ], 500);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Attendance updated successfully',
-            'attendance' => $attendance,
-        ]);
-    }
-
-    /**
      * Retrieve the current agenda
      */
     public function show($slug = null) {
@@ -118,6 +58,10 @@ class AgendaController extends Controller
                         $dayData = [];
                         // Go over all the atendances of that day
                         foreach ($day->attendance as $attendance) {
+
+                            if ($attendance->status != "approved") {
+                                continue;
+                            }
 
                             // if the department is set, check if the user is in that department if not continue
                             if ( $department && (
