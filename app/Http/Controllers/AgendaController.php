@@ -59,7 +59,7 @@ class AgendaController extends Controller
                         // Go over all the atendances of that day
                         foreach ($day->attendance as $attendance) {
 
-                            if ($attendance->status != "approved") {
+                            if ($attendance->attendance_status != "approved") {
                                 continue;
                             }
 

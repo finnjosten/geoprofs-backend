@@ -9,7 +9,7 @@ class Attendance extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['day_id', 'user_id', 'morning', 'afternoon'];
+    protected $fillable = ['day_id', 'user_id', 'morning', 'afternoon', 'attendance_status'];
 
     public function day()
     {
