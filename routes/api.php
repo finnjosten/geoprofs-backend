@@ -26,13 +26,12 @@ Route::group(['prefix' => 'auth'], function () {
 });
 
 // Allow creating users without auth when app is in local mode
-Route::post('users/create',[UserController::class, 'store'])->name('users.create');
-if (env('APP_ENV') == 'production') Route::post('users/create',[UserController::class, 'store'])->name('users.create')->middleware('auth:sanctum');
 Route::get      ('user/',                           [UserController::class, 'showCurrent']  )->name('users.self')->middleware('auth:sanctum');
 Route::get      ('users/',                          [UserController::class, 'index']        )->name('users.index')->middleware('auth:sanctum');
+Route::post     ('users/create',                    [UserController::class, 'store']        )->name('users.create')->middleware('auth:sanctum');
 Route::get      ('users/{id}',                      [UserController::class, 'show']         )->name('users.show')->middleware('auth:sanctum');
 Route::post     ('users/{id}/update',               [UserController::class, 'update']       )->name('users.update')->middleware('auth:sanctum');
-Route::delete   ('users/{id}/delete',               [UserController::class, 'destroy']      )->name('users.delete')->middleware('auth:sanctum');
+Route::match    (['DELETE','POST'],'users/{id}/delete',[UserController::class, 'destroy']   )->name('users.delete')->middleware('auth:sanctum');
 
 Route::get      ('agenda/get/{slug?}',              [AgendaController::class, 'show']       )->name('agenda.show')->middleware('auth:sanctum');
 Route::get      ('agenda/generate',                 [AgendaController::class, 'generate']   )->name('agenda.generate')->middleware('auth:sanctum');
@@ -41,10 +40,10 @@ Route::get      ('attendance/',                     [AttendanceController::class
 Route::post     ('attendance/create',               [AttendanceController::class, 'store']  )->name('atendance.store')->middleware('auth:sanctum');
 Route::get      ('attendance/{id}',                 [AttendanceController::class, 'show']   )->name('atendance.show')->middleware('auth:sanctum');
 Route::post     ('attendance/{id}/update',          [AttendanceController::class, 'update'] )->name('atendance.update')->middleware('auth:sanctum');
-Route::post     ('attendance/{id}/delete',          [AttendanceController::class, 'destroy'] )->name('atendance.delete')->middleware('auth:sanctum');
+Route::match    (['DELETE','POST'],'attendance/{id}/delete',[AttendanceController::class,'destroy'])->name('atendance.delete')->middleware('auth:sanctum');
 
 Route::get      ('attendance-status/',              [AttendanceStatusController::class, 'index'] )->name('attendance.status.index')->middleware('auth:sanctum');
 Route::post     ('attendance-status/create',        [AttendanceStatusController::class, 'store'] )->name('attendance.status.store')->middleware('auth:sanctum');
 Route::get      ('attendance-status/{slug}',        [AttendanceStatusController::class, 'show']  )->name('attendance.status.show')->middleware('auth:sanctum');
 Route::post     ('attendance-status/{slug}/update', [AttendanceStatusController::class, 'update'])->name('attendance.status.update')->middleware('auth:sanctum');
-Route::delete   ('attendance-status/{slug}/delete', [AttendanceStatusController::class, 'destroy'])->name('attendance.status.delete')->middleware('auth:sanctum');
+Route::match    (['DELETE','POST'],'attendance-status/{slug}/delete', [AttendanceStatusController::class, 'destroy'])->name('attendance.status.delete')->middleware('auth:sanctum');
