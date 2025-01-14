@@ -132,7 +132,6 @@ class UserController extends Controller {
             // Return a JSON response with validation errors
             return response()->json([
                 "error" => "Validation error",
-                "code" => "validation_error",
                 'errors' => $validator->errors(),
                 'code' => 'validation_error',
             ], 422);
@@ -264,7 +263,6 @@ class UserController extends Controller {
             // Return a JSON response with validation errors
             return response()->json([
                 'error' => "Validation error",
-                'code' => 'validation_error',
                 'errors' => $validator->errors(),
                 'code' => 'validation_error',
             ], 422);
