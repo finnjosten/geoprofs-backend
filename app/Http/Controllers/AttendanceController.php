@@ -205,7 +205,7 @@ class AttendanceController extends Controller
                 'date' => $data['date'] ?? $attendance->date,
                 'morning' => $data['morning'] ?? $attendance->morning,
                 'afternoon' => $data['afternoon'] ?? $attendance->afternoon,
-                'status' => $data['status'] ?? $attendance->status,
+                'attendance_status' => $data['status'] ?? $attendance->status,
             ]);
 
         } catch (\Exception $e) {
