@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AttendanceStatus;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Department;
@@ -112,6 +113,40 @@ class DatabaseSeeder extends Seeder
         Department::factory()->create([
             'name' => 'ICT',
             'slug' => 'ict',
+        ]);
+
+
+
+        AttendanceStatus::factory()->create([
+            'slug' => 'nvt',
+            'name' => 'nvt',
+            'description' => null,
+            'show_in_agenda' => true,
+            'default' => true,
+        ]);
+
+        AttendanceStatus::factory()->create([
+            'slug' => 'approved',
+            'name' => 'approved',
+            'description' => null,
+            'show_in_agenda' => true,
+            'default' => false,
+        ]);
+
+        AttendanceStatus::factory()->create([
+            'slug' => 'denied',
+            'name' => 'denied',
+            'description' => null,
+            'show_in_agenda' => false,
+            'default' => false,
+        ]);
+
+        AttendanceStatus::factory()->create([
+            'slug' => 'pending',
+            'name' => 'pending',
+            'description' => null,
+            'show_in_agenda' => false,
+            'default' => false,
         ]);
 
 

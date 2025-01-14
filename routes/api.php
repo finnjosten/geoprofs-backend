@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AttendanceStatusController;
 
 /* Route::get('/user', function (Request $request) {
     return $request->user();
@@ -41,3 +42,9 @@ Route::post     ('attendance/create',               [AttendanceController::class
 Route::get      ('attendance/{id}',                 [AttendanceController::class, 'show']   )->name('atendance.show')->middleware('auth:sanctum');
 Route::post     ('attendance/{id}/update',          [AttendanceController::class, 'update'] )->name('atendance.update')->middleware('auth:sanctum');
 Route::post     ('attendance/{id}/delete',          [AttendanceController::class, 'destroy'] )->name('atendance.delete')->middleware('auth:sanctum');
+
+Route::get      ('attendance-status/',              [AttendanceStatusController::class, 'index'] )->name('attendance.status.index')->middleware('auth:sanctum');
+Route::post     ('attendance-status/create',        [AttendanceStatusController::class, 'store'] )->name('attendance.status.store')->middleware('auth:sanctum');
+Route::get      ('attendance-status/{slug}',        [AttendanceStatusController::class, 'show']  )->name('attendance.status.show')->middleware('auth:sanctum');
+Route::post     ('attendance-status/{slug}/update', [AttendanceStatusController::class, 'update'])->name('attendance.status.update')->middleware('auth:sanctum');
+Route::delete   ('attendance-status/{slug}/delete', [AttendanceStatusController::class, 'destroy'])->name('attendance.status.delete')->middleware('auth:sanctum');
