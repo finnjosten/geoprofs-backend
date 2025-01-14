@@ -7,19 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use App\Models\User;
 use Tests\TestCase;
 
-class UserTest extends TestCase
-{
-
-    private $api_token;
-    private $user_id;
-
-    public function set_api_token() {
-        // Get api token to do the tests with
-        $response = $this->post('/api/auth/testing', ['testing_key' => 'MKfUKBND9s901CkR2aj5MIagDlM7jXAl']);
-        $this->api_token = json_decode($response->getContent())->access_token;
-        $this->user_id = json_decode($response->getContent())->user->id;
-
-    }
+class UserTest extends TestCase {
 
     public function test_get_all_users() : void {
 
@@ -33,6 +21,8 @@ class UserTest extends TestCase
         $response->assertStatus(200);
         $this->assertIsArray($data);
         $this->assertNotEmpty($data);
+
+        $this->end_session();
     }
 
     public function test_get_user() : void {
@@ -49,11 +39,7 @@ class UserTest extends TestCase
         $this->assertIsObject($data);
         $this->assertNotEmpty($data);
 
-
-        // Logout the user
-        $this->withHeaders([
-            'Authorization' => 'Bearer ' . $this->api_token,
-        ])->get('/api/auth/testing-logout/');
+        $this->end_session();
     }
 
     public function test_remove_user(): void {
@@ -115,10 +101,7 @@ class UserTest extends TestCase
             ])->delete('/api/users/'.$user_id.'/delete');
         }
 
-        // Logout the user
-        $this->withHeaders([
-            'Authorization' => 'Bearer ' . $this->api_token,
-        ])->get('/api/auth/testing-logout/');
+        $this->end_session();
 
     }
 }
