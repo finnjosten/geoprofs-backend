@@ -54,13 +54,14 @@ class AttendanceController extends Controller
         if ($validator->fails()) {
             // Return a JSON response with validation errors
             return response()->json([
-                'error' => $validator->errors(),
+                'error' => 'Validation error',
+                'errors' => $validator->errors(),
                 'code' => 'validation_error',
             ], 422);
         }
 
         // Get the status that is marked to be used as default
-        
+
 
         // strip the time of the date
         $request->merge([
@@ -196,7 +197,8 @@ class AttendanceController extends Controller
         if ($validator->fails()) {
             // Return a JSON response with validation errors
             return response()->json([
-                'error' => $validator->errors(),
+                'error' => "Validation error",
+                'errors' => $validator->errors(),
                 'code' => 'validation_error',
             ], 422);
         }
@@ -265,16 +267,14 @@ class AttendanceController extends Controller
         }
 
         // We can not delete an attendance so we will change it back to a default state
-        $attendance->list([
+        $attendance->update([
             'morning' => 0,
             'afternoon' => 0,
             'status' => 'nvt',
         ]);
-        $attendance->save();
-
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => 'Attendance can not be deleted so it has been changed back to a default state',
         ]);
     }
