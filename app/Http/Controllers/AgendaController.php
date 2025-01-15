@@ -219,5 +219,10 @@ class AgendaController extends Controller
             ], 500);
         }
 
+        return response()->json([
+            'success' => true,
+            'message' => 'Agenda generated successfully'
+        ]);
+
     }
 }
