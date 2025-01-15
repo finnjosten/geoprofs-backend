@@ -11,6 +11,12 @@ use App\Models\Year;
 use App\Models\Week;
 use App\Models\Day;
 
+/**
+ * @group Attendance management
+ * @authenticated
+ *
+ * APIs for managing users
+ */
 class AttendanceController extends Controller
 {
 
@@ -35,12 +41,17 @@ class AttendanceController extends Controller
         ]);
     }
 
+
+
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created attendance.
+     * @bodyParam date                 date of the attendance              Example: 2025-01-01
+     * @bodyParam morning              the status for the monring          Example: 1 | max: 5
+     * @bodyParam afternoon            the status for the monring          Example: 1 | max: 5
      */
     public function store(Request $request) {
 
-        $data = $request->only('week_number', 'date', 'morning', 'afternoon');
+        $data = $request->only('date', 'morning', 'afternoon');
 
         $validator = Validator::make($data, [
             'date' => 'required|date',
@@ -148,6 +159,11 @@ class AttendanceController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * @urlParam id required The ID of the attendance. Example: 2
+     * @bodyParam date                 date of the attendance              Example: 2025-01-01
+     * @bodyParam morning              the status for the monring          Example: 1 | max: 5
+     * @bodyParam afternoon            the status for the monring          Example: 1 | max: 5
+     * @bodyParam status               the attednace_status slug of the attendance          Example: pending | approved | rejected
      */
     public function update(Request $request, $attendance_id) {
 
@@ -232,6 +248,7 @@ class AttendanceController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * @urlParam id required The ID of the attendance. Example: 2
      */
     public function destroy(Request $request, $attendance_id) {
 
