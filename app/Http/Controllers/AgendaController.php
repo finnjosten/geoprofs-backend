@@ -7,6 +7,7 @@ use App\Models\Year;
 use App\Models\Week;
 use App\Models\Day;
 use App\Models\Attendance;
+use App\Models\AttendanceStatus;
 use App\Models\Subdepartment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -59,7 +60,8 @@ class AgendaController extends Controller
                         // Go over all the atendances of that day
                         foreach ($day->attendance as $attendance) {
 
-                            if ($attendance->status != "approved") {
+                            $attendance_status = AttendanceStatus::where('slug', $attendance->attendance_status)->first();
+                            if ($attendance_status->show_in_agenda === false) {
                                 continue;
                             }
 

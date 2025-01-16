@@ -9,7 +9,7 @@ class Attendance extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['day_id', 'user_id', 'morning', 'afternoon'];
+    protected $fillable = ['day_id', 'user_id', 'morning', 'afternoon', 'attendance_status'];
 
     public function day()
     {
@@ -19,5 +19,9 @@ class Attendance extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function status() {
+        return $this->belongsTo(AttendanceStatus::class, 'attendance_status');
     }
 }

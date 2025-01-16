@@ -11,6 +11,12 @@ use App\Models\Year;
 use App\Models\Week;
 use App\Models\Day;
 
+/**
+ * @group Attendance management
+ * @authenticated
+ *
+ * APIs for managing users
+ */
 class AttendanceController extends Controller
 {
 
@@ -35,12 +41,17 @@ class AttendanceController extends Controller
         ]);
     }
 
+
+
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created attendance.
+     * @bodyParam date                 date of the attendance              Example: 2025-01-01
+     * @bodyParam morning              the status for the monring          Example: 1 | max: 5
+     * @bodyParam afternoon            the status for the monring          Example: 1 | max: 5
      */
     public function store(Request $request) {
 
-        $data = $request->only('week_number', 'date', 'morning', 'afternoon');
+        $data = $request->only('date', 'morning', 'afternoon');
 
         $validator = Validator::make($data, [
             'date' => 'required|date',
@@ -54,10 +65,14 @@ class AttendanceController extends Controller
         if ($validator->fails()) {
             // Return a JSON response with validation errors
             return response()->json([
-                'error' => $validator->errors(),
+                'error' => 'Validation error',
+                'errors' => $validator->errors(),
                 'code' => 'validation_error',
             ], 422);
         }
+
+        // Get the status that is marked to be used as default
+
 
         // strip the time of the date
         $request->merge([
@@ -144,6 +159,11 @@ class AttendanceController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * @urlParam id required The ID of the attendance. Example: 2
+     * @bodyParam date                 date of the attendance              Example: 2025-01-01
+     * @bodyParam morning              the status for the monring          Example: 1 | max: 5
+     * @bodyParam afternoon            the status for the monring          Example: 1 | max: 5
+     * @bodyParam status               the attednace_status slug of the attendance          Example: pending | approved | rejected
      */
     public function update(Request $request, $attendance_id) {
 
@@ -193,7 +213,8 @@ class AttendanceController extends Controller
         if ($validator->fails()) {
             // Return a JSON response with validation errors
             return response()->json([
-                'error' => $validator->errors(),
+                'error' => "Validation error",
+                'errors' => $validator->errors(),
                 'code' => 'validation_error',
             ], 422);
         }
@@ -205,7 +226,7 @@ class AttendanceController extends Controller
                 'date' => $data['date'] ?? $attendance->date,
                 'morning' => $data['morning'] ?? $attendance->morning,
                 'afternoon' => $data['afternoon'] ?? $attendance->afternoon,
-                'status' => $data['status'] ?? $attendance->status,
+                'attendance_status' => $data['status'] ?? $attendance->status,
             ]);
 
         } catch (\Exception $e) {
@@ -227,6 +248,7 @@ class AttendanceController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * @urlParam id required The ID of the attendance. Example: 2
      */
     public function destroy(Request $request, $attendance_id) {
 
@@ -261,11 +283,16 @@ class AttendanceController extends Controller
             ], 401);
         }
 
-        $attendance->delete();
+        // We can not delete an attendance so we will change it back to a default state
+        $attendance->update([
+            'morning' => 0,
+            'afternoon' => 0,
+            'status' => 'nvt',
+        ]);
 
         return response()->json([
-            'status' => 'success',
-            'message' => 'Attendance deleted successfully',
+            'success' => true,
+            'message' => 'Attendance can not be deleted so it has been changed back to a default state',
         ]);
     }
 }
