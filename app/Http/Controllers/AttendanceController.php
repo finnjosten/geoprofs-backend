@@ -81,6 +81,15 @@ class AttendanceController extends Controller
             'status' => 'pending',
         ]);
 
+        // Check if the date is the current date or later
+        if (strtotime($request->date) < strtotime(date('Y-m-d'))) {
+            return response()->json([
+                'error' => 'Invalid date',
+                'code' => 'invalid_date',
+                'message' => 'You can not add attendance for a future date',
+            ], 422);
+        }
+
         try {
             // get the week number from the date()
             $weekNumber = date('W', strtotime($request->date));
