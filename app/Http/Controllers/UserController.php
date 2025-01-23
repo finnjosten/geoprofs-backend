@@ -72,7 +72,7 @@ class UserController extends Controller {
 
         return response()->json([
             'success' => true,
-            "data" => $users,
+            "users" => $users,
         ]);
     }
 
@@ -84,15 +84,15 @@ class UserController extends Controller {
      * @bodyParam department_slug       slug of the department          Example: geoict
      * @bodyParam subdepartment_slug    slug of the subdepartment       Example: scanning
      * @bodyParam supervisor_id         user id of the supervisor       Example: 1
-     * @bodyParam blocked               true/false if user is blocked   Example: false
-     * @bodyParam verified              true/false if user is verified  Example: true
+     * @bodyParam blocked               true/false if user is blocked   Example: false | null
+     * @bodyParam verified              true/false if user is verified  Example: true | null
      * @bodyParam first_name            first name of the user          Example: John
      * @bodyParam sure_name             sure name of the user           Example: Doe
      * @bodyParam bsn                   BSN of the user                 Example: 123456789
      * @bodyParam date_of_service       Date of when the user started   Example: 2021-01-01
-     * @bodyParam sick_days             ammount of sick days used       Example: 0
-     * @bodyParam vac_days              ammount of vacation days used   Example: 0
-     * @bodyParam personal_days         ammount of personal days used   Example: 0
+     * @bodyParam sick_days             ammount of sick days used       Example: 0 | null
+     * @bodyParam vac_days              ammount of vacation days used   Example: 0 | null
+     * @bodyParam personal_days         ammount of personal days used   Example: 0 | null
      * @bodyParam max_vac_days          max ammount of leave days       Example: 30
      */
     public function store(Request $request) {
@@ -100,14 +100,34 @@ class UserController extends Controller {
         $data = $request->only(...$this->request_fields);
 
         // Define validation rules
-        $validator = Validator::make($data, $this->validator_fields);
+        $validator = Validator::make($data, [
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|max:64',
+
+            'role_slug' => 'nullable|string|exists:roles,slug',
+            'department_slug' => 'nullable|string|exists:departments,slug',
+            'subdepartment_slug' => 'nullable|string|exists:subdepartments,slug',
+            'supervisor_id' => 'nullable|integer|exists:users,id',
+
+            'blocked' => 'nullable|boolean',
+            'verified' => 'nullable|boolean',
+
+            'first_name' => 'required|string|max:64',
+            'sure_name' => 'required|string|max:64',
+            'bsn' => 'required|string|max:9|unique:users,bsn',
+            'date_of_service' => 'required|date',
+
+            'sick_days' => 'nullable|integer',
+            'vac_days' => 'nullable|integer',
+            'personal_days' => 'nullable|integer',
+            'max_vac_days' => 'nullable|integer',
+        ]);
 
         // Check if the validation fails
         if ($validator->fails()) {
             // Return a JSON response with validation errors
             return response()->json([
                 "error" => "Validation error",
-                "code" => "validation_error",
                 'errors' => $validator->errors(),
                 'code' => 'validation_error',
             ], 422);
@@ -207,21 +227,57 @@ class UserController extends Controller {
         $data = $request->only(...$this->request_fields);
 
         // Define validation rules
-        $validator = Validator::make($data, $this->validator_fields);
+        $validator = Validator::make($data, [
+            'email' => 'nullable|email|unique:users,email',
+            'password' => 'nullable|string|min:8|max:64',
+
+            'role_slug' => 'nullable|string|exists:roles,slug',
+            'department_slug' => 'nullable|string|exists:departments,slug',
+            'subdepartment_slug' => 'nullable|string|exists:subdepartments,slug',
+            'supervisor_id' => 'nullable|integer|exists:users,id',
+
+            'blocked' => 'nullable|boolean',
+            'verified' => 'nullable|boolean',
+
+            'first_name' => 'nullable|string|max:64',
+            'sure_name' => 'nullable|string|max:64',
+            'bsn' => 'nullable|string|max:9|unique:users,bsn',
+            'date_of_service' => 'nullable|date',
+
+            'sick_days' => 'nullable|integer',
+            'vac_days' => 'nullable|integer',
+            'personal_days' => 'nullable|integer',
+            'max_vac_days' => 'nullable|integer',
+        ]);
 
         // Check if the validation fails
         if ($validator->fails()) {
             // Return a JSON response with validation errors
             return response()->json([
                 'error' => "Validation error",
-                'code' => 'validation_error',
                 'errors' => $validator->errors(),
                 'code' => 'validation_error',
             ], 422);
         }
 
+        if (empty($user_id)) {
+            return response()->json([
+                'error' => "User ID not provided",
+                'code' => 'user_id_not_provided',
+                'message' => 'User ID not provided',
+            ], 422);
+        }
+
         // Create the user with the validated data
-        $user = User::find()->whereId($user_id)->first();
+        $user = User::find($user_id)->first();
+
+        if (!$user) {
+            return response()->json([
+                'error' => "User not found",
+                'code' => 'user_not_found',
+                'message' => 'User not found',
+            ], 404);
+        }
 
         $user->fill([
             'email' => $data['email'] ?? $user->email,

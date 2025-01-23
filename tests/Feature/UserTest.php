@@ -17,7 +17,7 @@ class UserTest extends TestCase {
             'Authorization' => 'Bearer ' . $this->api_token,
         ])->get('/api/users');
 
-        $data = json_decode($response->getContent())->data;
+        $data = json_decode($response->getContent())->users;
         $response->assertStatus(200);
         $this->assertIsArray($data);
         $this->assertNotEmpty($data);
@@ -34,7 +34,7 @@ class UserTest extends TestCase {
             'Authorization' => 'Bearer ' . $this->api_token,
         ])->get('/api/users/'. $this->user_id);
 
-        $data = json_decode($response->getContent())->data;
+        $data = json_decode($response->getContent())->user;
         $response->assertStatus(200);
         $this->assertIsObject($data);
         $this->assertNotEmpty($data);

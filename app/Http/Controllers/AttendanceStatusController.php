@@ -7,6 +7,13 @@ use App\Models\AttendanceStatus;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 
+
+/**
+ * @group Attendance Status management
+ * @authenticated
+ *
+ * APIs for managing users
+ */
 class AttendanceStatusController extends Controller
 {
     /**
@@ -51,6 +58,11 @@ class AttendanceStatusController extends Controller
 
     /**
      * Show the form for creating a new resource.
+     * @bodyParam slug              string required The slug of the status  Example: aanwezig
+     * @bodyParam name              string required The name of the status  Example: Aanwezig
+     * @bodyParam description       string The description of the status    Example: De gebruiker is aanwezig
+     * @bodyParam show_in_agenda    boolean The status should be shown in the agenda    Example: true
+     * @bodyParam default           boolean The status is the default status            Example: false
      */
     public function store() {
         $data = Request::only('slug', 'name', 'description', 'show_in_agenda', 'default', 'default_after_create', 'default_approve', 'default_deny');
@@ -118,6 +130,12 @@ class AttendanceStatusController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * @urlParam slug required The slug of the status. Example: aanwezig
+     * @bodyParam slug              string required The slug of the status  Example: aanwezig
+     * @bodyParam name              string required The name of the status  Example: Aanwezig
+     * @bodyParam description       string The description of the status    Example: De gebruiker is aanwezig
+     * @bodyParam show_in_agenda    boolean The status should be shown in the agenda    Example: true
+     * @bodyParam default           boolean The status is the default status            Example: false
      */
     public function update($slug) {
         $data = Request::only('slug', 'name', 'description', 'show_in_agenda', 'default', 'default_after_create', 'default_approve', 'default_deny');
@@ -195,6 +213,7 @@ class AttendanceStatusController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * @urlParam slug required The slug of the status. Example: aanwezig
      */
     public function destroy($slug) {
 
