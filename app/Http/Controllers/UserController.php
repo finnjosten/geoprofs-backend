@@ -31,10 +31,8 @@ class UserController extends Controller {
         'bsn',
         'date_of_service',
 
-        'sick_days',
-        'vac_days',
-        'personal_days',
-        'max_vac_days'
+        'used_attendance',
+        'max_attendance'
     );
 
     private $validator_fields = array(
@@ -54,10 +52,8 @@ class UserController extends Controller {
         'bsn' => 'required|string|max:9|unique:users,bsn',
         'date_of_service' => 'required|date',
 
-        'sick_days' => 'nullable|integer',
-        'vac_days' => 'nullable|integer',
-        'personal_days' => 'nullable|integer',
-        'max_vac_days' => 'nullable|integer',
+        'used_attendance' => 'nullable|integer',
+        'max_attendance' => 'nullable|integer',
     );
 
     /**
@@ -135,10 +131,8 @@ class UserController extends Controller {
             'bsn' => $data['bsn'],
             'date_of_service' => $data['date_of_service'],
 
-            'sick_days' => $data['sick_days'] ?? 0,
-            'vac_days' => $data['vac_days'] ?? 0,
-            'personal_days' => $data['personal_days'] ?? 0,
-            'max_vac_days' => $data['max_vac_days'] ?? 366,
+            'used_attendance' => $data['used_attendance'] ?? 0,
+            'max_attendance' => $data['max_attendance'] ?? 366,
         ]);
 
 
@@ -204,11 +198,9 @@ class UserController extends Controller {
      * @bodyParam first_name            first name of the user          Example: John | null
      * @bodyParam sure_name             sure name of the user           Example: Doe | null
      * @bodyParam bsn                   BSN of the user                 Example: 123456789 | null
-     * @bodyParam date_of_service       Date of when the user started   Example: 2021-01-01 | null
-     * @bodyParam sick_days             ammount of sick days used       Example: 0 | null
-     * @bodyParam vac_days              ammount of vacation days used   Example: 0 | null
-     * @bodyParam personal_days         ammount of personal days used   Example: 0 | null
-     * @bodyParam max_vac_days          max ammount of leave days       Example: 30 | null
+     * @bodyParam date_of_service       date of when the user started   Example: 2021-01-01 | null
+     * @bodyParam used_attendance       ammount of personal days used   Example: 0 | null
+     * @bodyParam max_attendance        max ammount of leave days       Example: 30 | null
      */
     public function update(Request $request, $user_id) {
 
@@ -247,10 +239,8 @@ class UserController extends Controller {
             'bsn' => $data['bsn'] ?? $user->bsn,
             'date_of_service' => $data['date_of_service'] ?? $user->date_of_service,
 
-            'sick_days' => $data['sick_days'] ?? $user->sick_days,
-            'vac_days' => $data['vac_days'] ?? $user->vac_days,
-            'personal_days' => $data['personal_days'] ?? $user->personal_days,
-            'max_vac_days' => $data['max_vac_days'] ?? $user->max_vac_days,
+            'used_attendance' => $data['used_attendance'] ?? $user->used_attendance,
+            'max_attendance' => $data['max_attendance'] ?? $user->max_attendance,
         ]);
 
         $user->save();

@@ -24,10 +24,8 @@ class UserFactory extends Factory
     public function definition(): array
     {
 
-        $max_vac_days = fake()->numberBetween(0,366);
-        $sick_days = fake()->numberBetween(0, 10);
-        $vac_days = fake()->numberBetween(0, $max_vac_days);
-        $personal_days = fake()->numberBetween(0, $max_vac_days - $vac_days);
+        $max_attendance = fake()->numberBetween(0,366);
+        $used_attendance = fake()->numberBetween(0, $max_attendance);
 
         $department_slug = fake()->randomElement(['geoict', 'geodesy', 'relation-management', 'finance', 'hrm', 'ict']);
         if ($department_slug === 'geoict') {
@@ -61,10 +59,8 @@ class UserFactory extends Factory
             'bsn' => fake()->unique()->numberBetween(100000000, 999999999),
             'date_of_service' => fake()->date(),
 
-            'sick_days' => $sick_days,
-            'vac_days' => $vac_days,
-            'personal_days' => $personal_days,
-            'max_vac_days' => $max_vac_days,
+            'used_attendance' => $used_attendance,
+            'max_attendance' => $max_attendance,
 
             'remember_token' => Str::random(10),
         ];

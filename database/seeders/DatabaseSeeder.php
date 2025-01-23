@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AttendanceReason;
 use App\Models\AttendanceStatus;
 use App\Models\User;
 use App\Models\Role;
@@ -123,6 +124,9 @@ class DatabaseSeeder extends Seeder
             'description' => null,
             'show_in_agenda' => true,
             'default' => true,
+            'default_after_create' => false,
+            'default_approve' => false,
+            'default_deny' => false,
         ]);
 
         AttendanceStatus::factory()->create([
@@ -131,6 +135,9 @@ class DatabaseSeeder extends Seeder
             'description' => null,
             'show_in_agenda' => true,
             'default' => false,
+            'default_after_create' => false,
+            'default_approve' => true,
+            'default_deny' => false,
         ]);
 
         AttendanceStatus::factory()->create([
@@ -139,6 +146,9 @@ class DatabaseSeeder extends Seeder
             'description' => null,
             'show_in_agenda' => false,
             'default' => false,
+            'default_after_create' => false,
+            'default_approve' => false,
+            'default_deny' => true,
         ]);
 
         AttendanceStatus::factory()->create([
@@ -147,7 +157,64 @@ class DatabaseSeeder extends Seeder
             'description' => null,
             'show_in_agenda' => false,
             'default' => false,
+            'default_after_create' => true,
+            'default_approve' => false,
+            'default_deny' => false,
         ]);
+
+
+
+        AttendanceReason::factory()->create([
+            'slug' => 'aanwezig',
+            'name' => 'Aanwezig',
+            'description' => "A reason for when someone is present",
+            'default' => true,
+        ]);
+
+        AttendanceReason::factory()->create([
+            'slug' => 'overig',
+            'name' => 'Overig',
+            'description' => "A reason for items that doesn't fit in the other categories",
+            'default' => false,
+        ]);
+
+        AttendanceReason::factory()->create([
+            'slug' => 'ziek',
+            'name' => 'Ziek',
+            'description' => "A reason for when someone is sick",
+            'default' => false,
+        ]);
+
+        AttendanceReason::factory()->create([
+            'slug' => 'vakantie',
+            'name' => 'Vakantie',
+            'description' => "A reason for when someone is on leave",
+            'default' => false,
+        ]);
+
+        AttendanceReason::factory()->create([
+            'slug' => 'persoonlijk',
+            'name' => 'Persoonlijk',
+            'description' => "A reason for when someone is on leave",
+            'default' => false,
+        ]);
+
+        AttendanceReason::factory()->create([
+            'slug' => 'zwangerschap',
+            'name' => 'Zwangerschap',
+            'description' => "A reason for when someone is on leave",
+            'default' => false,
+        ]);
+
+        AttendanceReason::factory()->create([
+            'slug' => 'ouderschap',
+            'name' => 'Ouderschap',
+            'description' => "A reason for when someone is on leave",
+            'default' => false,
+        ]);
+
+
+
 
 
 

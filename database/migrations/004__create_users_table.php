@@ -42,10 +42,8 @@ return new class extends Migration
             $table->date('date_of_service');
 
             // Vacation days
-            $table->integer('sick_days')->default(0);
-            $table->integer('vac_days')->default(0);
-            $table->integer('personal_days')->default(0);
-            $table->integer('max_vac_days')->default(366);
+            $table->float('used_attendance')->default(0);
+            $table->float('max_attendance')->default(100);
 
             $table->rememberToken();
             $table->timestamps();

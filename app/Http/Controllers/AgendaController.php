@@ -183,6 +183,9 @@ class AgendaController extends Controller
             for ($i = 0; $i < 3; $i++) {
                 $years[] = date('Y', strtotime("-$i year"));
             }
+            for ($i = 0; $i < 3; $i++) {
+                $years[] = date('Y', strtotime("+$i year"));
+            }
 
             foreach ($years as $year) {
 

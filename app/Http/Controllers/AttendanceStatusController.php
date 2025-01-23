@@ -53,7 +53,7 @@ class AttendanceStatusController extends Controller
      * Show the form for creating a new resource.
      */
     public function store() {
-        $data = Request::only('slug', 'name', 'description', 'show_in_agenda');
+        $data = Request::only('slug', 'name', 'description', 'show_in_agenda', 'default', 'default_after_create', 'default_approve', 'default_deny');
 
         // Check if the show_in_agenda is set if not set it to false other wise get the bool value
         if (!isset($data['show_in_agenda'])) {
@@ -69,12 +69,36 @@ class AttendanceStatusController extends Controller
             $data['default'] = boolval($data['default']);
         }
 
+        // Check if the default_after_create is set if not set it to false other wise get the bool value
+        if (!isset($data['default_after_create'])) {
+            $data['default_after_create'] = false;
+        } else {
+            $data['default_after_create'] = boolval($data['default_after_create']);
+        }
+
+        // Check if the default_approve is set if not set it to false other wise get the bool value
+        if (!isset($data['default_approve'])) {
+            $data['default_approve'] = false;
+        } else {
+            $data['default_approve'] = boolval($data['default_approve']);
+        }
+
+        // Check if the default_deny is set if not set it to false other wise get the bool value
+        if (!isset($data['default_deny'])) {
+            $data['default_deny'] = false;
+        } else {
+            $data['default_deny'] = boolval($data['default_deny']);
+        }
+
         $validator = Validator::make($data, [
             'slug' => 'required|string|unique:attendance_statuses',
             'name' => 'required|string',
             'description' => 'nullable|string',
             'show_in_agenda' => 'nullable|boolean',
             'default' => 'nullable|boolean',
+            'default_after_create' => 'nullable|boolean',
+            'default_approve' => 'nullable|boolean',
+            'default_deny' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -96,18 +120,41 @@ class AttendanceStatusController extends Controller
      * Update the specified resource in storage.
      */
     public function update($slug) {
-        $data = Request::only('slug', 'name', 'description', 'show_in_agenda');
+        $data = Request::only('slug', 'name', 'description', 'show_in_agenda', 'default', 'default_after_create', 'default_approve', 'default_deny');
 
+        // Check if the show_in_agenda is set if not set it to false other wise get the bool value
         if (!isset($data['show_in_agenda'])) {
             $data['show_in_agenda'] = false;
         } else {
             $data['show_in_agenda'] = boolval($data['show_in_agenda']);
         }
 
+        // Check if the default is set if not set it to false other wise get the bool value
         if (!isset($data['default'])) {
             $data['default'] = false;
         } else {
             $data['default'] = boolval($data['default']);
+        }
+
+        // Check if the default_after_create is set if not set it to false other wise get the bool value
+        if (!isset($data['default_after_create'])) {
+            $data['default_after_create'] = false;
+        } else {
+            $data['default_after_create'] = boolval($data['default_after_create']);
+        }
+
+        // Check if the default_approve is set if not set it to false other wise get the bool value
+        if (!isset($data['default_approve'])) {
+            $data['default_approve'] = false;
+        } else {
+            $data['default_approve'] = boolval($data['default_approve']);
+        }
+
+        // Check if the default_deny is set if not set it to false other wise get the bool value
+        if (!isset($data['default_deny'])) {
+            $data['default_deny'] = false;
+        } else {
+            $data['default_deny'] = boolval($data['default_deny']);
         }
 
         $status = AttendanceStatus::where('slug', $slug)->first();
@@ -126,6 +173,9 @@ class AttendanceStatusController extends Controller
             'description' => 'nullable|string',
             'show_in_agenda' => 'nullable|boolean',
             'default' => 'nullable|boolean',
+            'default_after_create' => 'nullable|boolean',
+            'default_approve' => 'nullable|boolean',
+            'default_deny' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -135,8 +185,7 @@ class AttendanceStatusController extends Controller
             ], 422);
         }
 
-        $status->fill($data);
-        $status->save();
+        $status->update($data);
 
         return response()->json([
             "success" => true,
