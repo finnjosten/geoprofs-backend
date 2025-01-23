@@ -183,6 +183,9 @@ class AgendaController extends Controller
             for ($i = 0; $i < 3; $i++) {
                 $years[] = date('Y', strtotime("-$i year"));
             }
+            for ($i = 0; $i < 3; $i++) {
+                $years[] = date('Y', strtotime("+$i year"));
+            }
 
             foreach ($years as $year) {
 
@@ -218,6 +221,11 @@ class AgendaController extends Controller
                 'code' => 'error',
             ], 500);
         }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Agenda generated successfully'
+        ]);
 
     }
 }

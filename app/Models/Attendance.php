@@ -9,16 +9,22 @@ class Attendance extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['day_id', 'user_id', 'morning', 'afternoon', 'attendance_status'];
+    protected $fillable = ['day_id', 'user_id', 'morning', 'afternoon', 'description', 'attendance_status', 'count_to_total'];
 
-    public function day()
-    {
+    public function day() {
         return $this->belongsTo(Day::class);
     }
 
-    public function user()
-    {
+    public function user() {
         return $this->belongsTo(User::class);
+    }
+
+    public function morning() {
+        return $this->belongsTo(AttendanceReason::class, 'attendance_reason');
+    }
+
+    public function afternoon() {
+        return $this->belongsTo(AttendanceReason::class, 'attendance_reason');
     }
 
     public function status() {

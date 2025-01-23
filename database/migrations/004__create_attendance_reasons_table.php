@@ -11,16 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('attendance_statuses', function (Blueprint $table) {
+        Schema::create('attendance_reasons', function (Blueprint $table) {
             $table->id();
             $table->string('slug')->unique();
             $table->string('name');
             $table->string('description')->nullable();
-            $table->boolean('show_in_agenda')->default(false);
             $table->boolean('default')->default(false);
-            $table->boolean('default_after_create')->default(false);
-            $table->boolean('default_approve')->default(false);
-            $table->boolean('default_deny')->default(false);
             $table->timestamps();
         });
     }
@@ -30,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('attendance_statuses');
+        Schema::dropIfExists('attendance_reasons');
     }
 };

@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('day_id')->constrained('days')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users');
-            $table->integer('morning')->default(0);
-            $table->integer('afternoon')->default(0);
-            $table->string('attendance_reason')->nullable();
+            $table->string('morning');
+            $table->string('afternoon');
+            $table->string('description')->nullable();
             $table->string('attendance_status')->default('pending');
+            $table->boolean('count_to_total')->default(false);
             $table->timestamps();
         });
     }
