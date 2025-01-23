@@ -129,6 +129,10 @@ class AgendaController extends Controller
 
                             // save the data to the agenda
                             $dayData[$attendance->user_id] = [
+                                'user' => [
+                                    "first_name" => $attendance->user->first_name,
+                                    "sure_name" => $attendance->user->sure_name,
+                                ],
                                 'morning' => $attendance->morning,
                                 'afternoon' => $attendance->afternoon,
                             ];
