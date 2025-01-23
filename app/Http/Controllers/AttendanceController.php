@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 use App\Models\Attendance;
+use App\Models\AttendanceStatus;
+use App\Models\AttendanceReason;
 use App\Models\User;
 use App\Models\Year;
 use App\Models\Week;
@@ -51,14 +53,13 @@ class AttendanceController extends Controller
      */
     public function store(Request $request) {
 
-        $data = $request->only('date', 'morning', 'afternoon');
+        $data = $request->only('date', 'morning', 'afternoon', 'description');
 
         $validator = Validator::make($data, [
             'date' => 'required|date',
-            // 0 = aanwezig, 1 = ziek, 2 = vakantie, 3 = verlof, 4 = onbetaald verlof, 5 = feestdag
-            'morning' => 'nullable|integer|min:0|max:5',
-            // 0 = aanwezig, 1 = ziek, 2 = vakantie, 3 = verlof, 4 = onbetaald verlof, 5 = feestdag
-            'afternoon' => 'nullable|integer|min:0|max:5',
+            'morning' => 'required|string|exists:attendance_reasons,slug',
+            'afternoon' => 'required|string|exists:attendance_reasons,slug',
+            'description' => 'nullable|string',
         ]);
 
         // Check if the validation fails
@@ -72,13 +73,13 @@ class AttendanceController extends Controller
         }
 
         // Get the status that is marked to be used as default
-
+        $status = AttendanceStatus::where('default_after_create', true)->first();
 
         // strip the time of the date
         $request->merge([
             'user_id' => $request->user()->id,
             'date' => date('Y-m-d', strtotime($request->date)),
-            'status' => 'pending',
+            'status' => $status->slug,
         ]);
 
         // Check if the date is the current date or later
@@ -104,9 +105,10 @@ class AttendanceController extends Controller
                     'user_id' => $request->user_id
                 ],
                 [
-                    'morning' => $request->morning ?? 0, // Default to 0 if not provided
-                    'afternoon' => $request->afternoon ?? 0, // Default to 0 if not provided
-                    'status' => $request->status,
+                    'morning' => $request->morning ?? 0,
+                    'afternoon' => $request->afternoon ?? 0,
+                    'attendance_status' => $request->status,
+                    'description' => $request->description ?? null,
                 ]
             );
         } catch (\Exception $e) {
@@ -178,6 +180,7 @@ class AttendanceController extends Controller
 
         $attendance = Attendance::whereId($attendance_id)->first();
         $attendance_user = User::whereId($attendance->user_id)->first();
+        $current_user = $request->user();
 
         if (!$attendance) {
             return response()->json([
@@ -198,7 +201,7 @@ class AttendanceController extends Controller
 
         if (
             $attendance_user->id != $request->user()->id &&
-            $attendance_user->supervisor_id != $request->user()->id
+            !in_array($current_user->role_slug, ['manager', 'sub-manager', 'staff', 'ceo'])
         ) {
             return response()->json([
                 'error' => "Unauthorized",
@@ -209,13 +212,14 @@ class AttendanceController extends Controller
 
 
         // validate
-        $data = $request->only('date', 'morning', 'afternoon', 'status');
+        $data = $request->only('date', 'morning', 'afternoon', 'attendance_status', 'description');
 
         $validator = Validator::make($data, [
             'date' => 'nullable|date',
-            'morning' => 'nullable|integer|min:0|max:5',
-            'afternoon' => 'nullable|integer|min:0|max:5',
-            'status' => 'nullable|string|in:pending,approved,rejected',
+            'morning' => 'nullable|string|exists:attendance_reasons,slug',
+            'afternoon' => 'nullable|string|exists:attendance_reasons,slug',
+            'description' => 'nullable|string',
+            'attendance_status' => 'nullable|string|exists:attendance_statuses,slug',
         ]);
 
         // Check if the validation fails
@@ -228,6 +232,10 @@ class AttendanceController extends Controller
             ], 422);
         }
 
+        // Parse the date value
+        if (isset($data['date'])) {
+            $data['date'] = date('Y-m-d', strtotime($data['date']));
+        }
 
         try {
 
@@ -235,7 +243,8 @@ class AttendanceController extends Controller
                 'date' => $data['date'] ?? $attendance->date,
                 'morning' => $data['morning'] ?? $attendance->morning,
                 'afternoon' => $data['afternoon'] ?? $attendance->afternoon,
-                'attendance_status' => $data['status'] ?? $attendance->status,
+                'attendance_status' => $data['attendance_status'] ?? $attendance->attendance_status,
+                'description' => $data['description'] ?? $attendance->description,
             ]);
 
         } catch (\Exception $e) {
@@ -245,14 +254,11 @@ class AttendanceController extends Controller
             ], 500);
         }
 
-
         return response()->json([
             'status' => 'success',
             'message' => 'Attendance updated successfully',
             'attendance' => $attendance,
         ]);
-
-
     }
 
     /**
@@ -263,6 +269,7 @@ class AttendanceController extends Controller
 
         $attendance = Attendance::whereId($attendance_id)->first();
         $attendance_user = User::whereId($attendance->user_id)->first();
+        $current_user = $request->user();
 
         if (!$attendance) {
             return response()->json([
@@ -283,7 +290,7 @@ class AttendanceController extends Controller
 
         if (
             $attendance_user->id != $request->user()->id &&
-            $attendance_user->supervisor_id != $request->user()->id
+            !in_array($current_user->role_slug, ['manager', 'sub-manager', 'staff', 'ceo'])
         ) {
             return response()->json([
                 'error' => "Unauthorized",
@@ -292,11 +299,14 @@ class AttendanceController extends Controller
             ], 401);
         }
 
+        $status = AttendanceStatus::where('default_after_create', true)->first();
+        $reason = AttendanceReason::where('default', true)->first();
+
         // We can not delete an attendance so we will change it back to a default state
         $attendance->update([
-            'morning' => 0,
-            'afternoon' => 0,
-            'status' => 'nvt',
+            'morning' => $reason->slug,
+            'afternoon' => $reason->slug,
+            'status' => $status->slug,
         ]);
 
         return response()->json([
@@ -304,4 +314,182 @@ class AttendanceController extends Controller
             'message' => 'Attendance can not be deleted so it has been changed back to a default state',
         ]);
     }
+
+
+
+
+
+
+    /**
+     * Approve the specified attendance.
+     */
+    public function approve(Request $request, $attendance_id) {
+
+        $attendance = Attendance::whereId($attendance_id)->first();
+        $attendance_user = User::whereId($attendance->user_id)->first();
+        $current_user = $request->user();
+
+        if (!$attendance) {
+            return response()->json([
+                'error' => "Attendance not found",
+                'code' => 'attendance_not_found',
+                'message' => 'Attendance not found',
+            ], 404);
+        }
+
+        if (!$attendance_user) {
+            return response()->json([
+                'error' => "User not found",
+                'code' => 'user_not_found',
+                'message' => 'User not found',
+            ], 404);
+        }
+
+
+        if (
+            $attendance_user->id != $request->user()->id &&
+            !in_array($current_user->role_slug, ['manager', 'sub-manager', 'staff', 'ceo'])
+        ) {
+            return response()->json([
+                'error' => "Unauthorized",
+                'code' => 'unauthorized',
+                'message' => 'You are not authorized to view this attendance',
+            ], 401);
+        }
+
+
+        // validate
+        $data = $request->only('count_to_total');
+
+        if (!isset($data['count_to_total'])) {
+            $data['count_to_total'] = true;
+        } else {
+            $data['count_to_total'] = boolval($data['count_to_total']);
+        }
+
+        $validator = Validator::make($data, [
+            'count_to_total' => 'nullable|boolean',
+        ]);
+
+        // Check if the validation fails
+        if ($validator->fails()) {
+            // Return a JSON response with validation errors
+            return response()->json([
+                'error' => "Validation error",
+                'errors' => $validator->errors(),
+                'code' => 'validation_error',
+            ], 422);
+        }
+
+        try {
+
+            $status = AttendanceStatus::where('default_approve', true)->first();
+
+            $attendance->update([
+                'attendance_status' => $status->slug,
+                'count_to_total' => $data['count_to_total'] ?? $attendance->count_to_total,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'code' => 'error',
+            ], 500);
+        }
+
+        // If the attendance is approved we will count it to the total
+        if ($attendance->count_to_total) {
+
+            $default_reason = AttendanceReason::where('default', true)->first();
+
+            // Check if morning or afternoon or both is set
+            if ($attendance->morning != $default_reason->slug && $attendance->afternoon != $default_reason->slug) {
+                $attendance_user->used_attendance += 1;
+                $attendance_user->save();
+            } else if ($attendance->morning != $default_reason->slug || $attendance->afternoon != $default_reason->slug) {
+                $attendance_user->used_attendance += 0.5;
+                $attendance_user->save();
+            }
+
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Attendance approved successfully',
+            'attendance' => $attendance,
+        ]);
+
+
+
+    }
+
+
+    /**
+     * Deny the specified attendance.
+     */
+    public function deny(Request $request, $attendance_id) {
+
+        $attendance = Attendance::whereId($attendance_id)->first();
+        $attendance_user = User::whereId($attendance->user_id)->first();
+        $current_user = $request->user();
+
+        if (!$attendance) {
+            return response()->json([
+                'error' => "Attendance not found",
+                'code' => 'attendance_not_found',
+                'message' => 'Attendance not found',
+            ], 404);
+        }
+
+        if (!$attendance_user) {
+            return response()->json([
+                'error' => "User not found",
+                'code' => 'user_not_found',
+                'message' => 'User not found',
+            ], 404);
+        }
+
+
+        if (
+            $attendance_user->id != $request->user()->id &&
+            !in_array($current_user->role_slug, ['manager', 'sub-manager', 'staff', 'ceo'])
+        ) {
+            return response()->json([
+                'error' => "Unauthorized",
+                'code' => 'unauthorized',
+                'message' => 'You are not authorized to view this attendance',
+            ], 401);
+        }
+
+
+        try {
+
+            $status = AttendanceStatus::where('default_deny', true)->first();
+
+            $attendance->update([
+                'attendance_status' => $status->slug,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'code' => 'error',
+            ], 500);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Attendance approved successfully',
+            'attendance' => $attendance,
+        ]);
+
+    }
+
+
+
+
+
+
+
+
 }

@@ -9,5 +9,5 @@ class AttendanceStatus extends Model
 {
     use HasFactory;
 
-    protected $fillable = [ 'slug', 'name', 'description', 'show_in_agenda', 'default' ];
+    protected $fillable = [ 'slug', 'name', 'description', 'show_in_agenda', 'default', 'default_after_create', "default_approve", "default_deny" ];
 }
