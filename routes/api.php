@@ -36,6 +36,8 @@ Route::get      ('users/{id}',                      [UserController::class, 'sho
 Route::post     ('users/{id}/update',               [UserController::class, 'update']       )->name('users.update')->middleware('auth:sanctum');
 Route::match    (['DELETE','POST'],'users/{id}/delete',[UserController::class, 'destroy']   )->name('users.delete')->middleware('auth:sanctum');
 
+Route::get      ('roles/',                          [RoleController::class, 'index']        )->name('roles.index')->middleware('auth:sanctum');
+
 Route::get      ('agenda/get/{slug?}',              [AgendaController::class, 'show']       )->name('agenda.show')->middleware('auth:sanctum');
 Route::get      ('agenda/generate',                 [AgendaController::class, 'generate']   )->name('agenda.generate')->middleware('auth:sanctum');
 
