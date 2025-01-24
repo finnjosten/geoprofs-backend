@@ -328,6 +328,9 @@ class UserController extends Controller {
             ], 404);
         }
 
+        // Get all attendances of the user and delete them
+        $user->attendances()->delete();
+
         $user->tokens()->delete();
         $user->delete();
 
