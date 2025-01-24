@@ -126,7 +126,7 @@ class AttendanceController extends Controller
 
     }
 
-     /**
+    /**
      * Display the specified attendance.
      * @urlParam id required The ID of the attendance. Example: 2
      */
