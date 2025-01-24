@@ -117,10 +117,8 @@ class UserController extends Controller {
             'bsn' => 'required|string|max:9|unique:users,bsn',
             'date_of_service' => 'required|date',
 
-            'sick_days' => 'nullable|integer',
-            'vac_days' => 'nullable|integer',
-            'personal_days' => 'nullable|integer',
-            'max_vac_days' => 'nullable|integer',
+            'used_attendance' => 'nullable|integer',
+            'max_attendance' => 'nullable|integer',
         ]);
 
         // Check if the validation fails
@@ -244,10 +242,8 @@ class UserController extends Controller {
             'bsn' => 'nullable|string|max:9|unique:users,bsn',
             'date_of_service' => 'nullable|date',
 
-            'sick_days' => 'nullable|integer',
-            'vac_days' => 'nullable|integer',
-            'personal_days' => 'nullable|integer',
-            'max_vac_days' => 'nullable|integer',
+            'used_attendance' => 'nullable|integer',
+            'max_attendance' => 'nullable|integer',
         ]);
 
         // Check if the validation fails
