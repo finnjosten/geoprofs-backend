@@ -52,7 +52,7 @@ class UserFactory extends Factory
             'supervisor_id' => null,
 
             'verified' => fake()->boolean(85),
-            'blocked' => false,
+            'blocked' => 0,
 
             'first_name' => fake()->firstName(),
             'sure_name' => fake()->lastName(),
