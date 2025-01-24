@@ -94,7 +94,7 @@ class AttendanceController extends Controller
             return response()->json([
                 'error' => 'Invalid date',
                 'code' => 'invalid_date',
-                'message' => 'You can not add attendance for a future date',
+                'message' => 'You can not add attendance for a past date',
             ], 422);
         }
 
