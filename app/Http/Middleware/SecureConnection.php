@@ -19,11 +19,10 @@ class SecureConnection
     {
 
         if ($request->isSecure() || $request->getHost() === 'localhost' || str_ends_with($request->getHost(), '.test')) {
+            return $next($request);
         }
 
-        return response()->json([ 'error' => 'Request must be sent over HTTPS ' . $request->getHost(), ], 400);
-        return $next($request);
-
+        return response()->json([ 'error' => 'Request must be sent over HTTPS, request send to: ' . $request->getHost(), ], 400);
 
     }
 }
