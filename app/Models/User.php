@@ -34,10 +34,8 @@ class User extends Authenticatable
         'bsn',
         'date_of_service',
 
-        'sick_days',
-        'vac_days',
-        'personal_days',
-        'max_vac_days',
+        'used_attendance',
+        'max_attendance',
     ];
 
     /**
@@ -58,7 +56,6 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
