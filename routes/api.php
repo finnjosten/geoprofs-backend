@@ -3,10 +3,12 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\AuthController;
+
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\balanceController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceStatusController;
@@ -57,3 +59,5 @@ Route::post     ('attendance-reason/create',        [AttendanceReasonController:
 Route::get      ('attendance-reason/{slug}',        [AttendanceReasonController::class, 'show']     )->name('attendance.reason.show')->middleware('auth:sanctum');
 Route::post     ('attendance-reason/{slug}/update', [AttendanceReasonController::class, 'update']   )->name('attendance.reason.update')->middleware('auth:sanctum');
 Route::match    (['DELETE','POST'],'attendance-reason/{slug}/delete', [AttendanceReasonController::class, 'destroy']  )->name('attendance.reason.delete')->middleware('auth:sanctum');
+
+Route::get      ('balance/{user:id?}',              [balanceController::class, 'balance']    )->name('balance.index')->middleware('auth:sanctum');
