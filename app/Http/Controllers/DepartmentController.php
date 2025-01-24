@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Request;
 
 class DepartmentController extends Controller {
-    
+
     /**
      * Display a listing of the resource.
      */
