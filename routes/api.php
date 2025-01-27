@@ -3,10 +3,12 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\AuthController;
+
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceStatusController;
@@ -34,6 +36,8 @@ Route::get      ('users/{id}',                      [UserController::class, 'sho
 Route::post     ('users/{id}/update',               [UserController::class, 'update']       )->name('users.update')->middleware('auth:sanctum');
 Route::match    (['DELETE','POST'],'users/{id}/delete',[UserController::class, 'destroy']   )->name('users.delete')->middleware('auth:sanctum');
 
+Route::get      ('roles/',                          [RoleController::class, 'index']        )->name('roles.index')->middleware('auth:sanctum');
+
 Route::get      ('agenda/get/{slug?}',              [AgendaController::class, 'show']       )->name('agenda.show')->middleware('auth:sanctum');
 Route::get      ('agenda/generate',                 [AgendaController::class, 'generate']   )->name('agenda.generate')->middleware('auth:sanctum');
 
@@ -57,3 +61,5 @@ Route::post     ('attendance-reason/create',        [AttendanceReasonController:
 Route::get      ('attendance-reason/{slug}',        [AttendanceReasonController::class, 'show']     )->name('attendance.reason.show')->middleware('auth:sanctum');
 Route::post     ('attendance-reason/{slug}/update', [AttendanceReasonController::class, 'update']   )->name('attendance.reason.update')->middleware('auth:sanctum');
 Route::match    (['DELETE','POST'],'attendance-reason/{slug}/delete', [AttendanceReasonController::class, 'destroy']  )->name('attendance.reason.delete')->middleware('auth:sanctum');
+
+Route::get      ('balance/{user:id?}',              [BalanceController::class, 'balance']    )->name('balance.index')->middleware('auth:sanctum');

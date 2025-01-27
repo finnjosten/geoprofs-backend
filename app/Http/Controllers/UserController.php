@@ -35,31 +35,14 @@ class UserController extends Controller {
         'max_attendance'
     );
 
-    private $validator_fields = array(
-        'email' => 'required|email|unique:users,email',
-        'password' => 'required|string|min:8|max:64',
-
-        'role_slug' => 'nullable|string|exists:roles,slug',
-        'department_slug' => 'nullable|string|exists:departments,slug',
-        'subdepartment_slug' => 'nullable|string|exists:subdepartments,slug',
-        'supervisor_id' => 'nullable|integer|exists:users,id',
-
-        'blocked' => 'nullable|boolean',
-        'verified' => 'nullable|boolean',
-
-        'first_name' => 'required|string|max:64',
-        'sure_name' => 'required|string|max:64',
-        'bsn' => 'required|string|max:9|unique:users,bsn',
-        'date_of_service' => 'required|date',
-
-        'used_attendance' => 'nullable|integer',
-        'max_attendance' => 'nullable|integer',
-    );
-
     /**
      * Display all the users.
      */
     public function index() {
+
+        // Check if the user has permission to view all users
+        $this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo']);
+
         $users = User::all();
 
         if (!$users) {
@@ -97,6 +80,9 @@ class UserController extends Controller {
      */
     public function store(Request $request) {
 
+        // Check if the user has permission to view all users
+        $this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo']);
+
         $data = $request->only(...$this->request_fields);
 
         // Define validation rules
@@ -117,10 +103,8 @@ class UserController extends Controller {
             'bsn' => 'required|string|max:9|unique:users,bsn',
             'date_of_service' => 'required|date',
 
-            'sick_days' => 'nullable|integer',
-            'vac_days' => 'nullable|integer',
-            'personal_days' => 'nullable|integer',
-            'max_vac_days' => 'nullable|integer',
+            'used_attendance' => 'nullable|integer',
+            'max_attendance' => 'nullable|integer',
         ]);
 
         // Check if the validation fails
@@ -167,7 +151,18 @@ class UserController extends Controller {
      * Display the specified user.
      * @urlParam id required The ID of the user. Example: 2
      */
-    public function show($user_id) {
+    public function show(Request $request, $user_id) {
+
+        if ($user_id == $request->user()->id) {
+            return response()->json([
+                'error' => "Self view",
+                'code' => 'self_view',
+                'message' => 'This endpoint is meant to view other users not yourself! please use ' . route('users.self') . ' instead',
+            ], 401);
+        }
+
+        // Check if the user has permission to view all users
+        $this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo']);
 
         $user = User::whereId($user_id)->first();
 
@@ -224,6 +219,9 @@ class UserController extends Controller {
      */
     public function update(Request $request, $user_id) {
 
+        // Check if the user has permission to view all users
+        $this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo']);
+
         $data = $request->only(...$this->request_fields);
 
         // Define validation rules
@@ -244,10 +242,8 @@ class UserController extends Controller {
             'bsn' => 'nullable|string|max:9|unique:users,bsn',
             'date_of_service' => 'nullable|date',
 
-            'sick_days' => 'nullable|integer',
-            'vac_days' => 'nullable|integer',
-            'personal_days' => 'nullable|integer',
-            'max_vac_days' => 'nullable|integer',
+            'used_attendance' => 'nullable|integer',
+            'max_attendance' => 'nullable|integer',
         ]);
 
         // Check if the validation fails
@@ -268,8 +264,10 @@ class UserController extends Controller {
             ], 422);
         }
 
+        $user_id = intval($user_id);
+
         // Create the user with the validated data
-        $user = User::find($user_id)->first();
+        $user = User::where('id', $user_id)->first();
 
         if (!$user) {
             return response()->json([
@@ -279,7 +277,7 @@ class UserController extends Controller {
             ], 404);
         }
 
-        $user->fill([
+        $user->update([
             'email' => $data['email'] ?? $user->email,
 
             'role_slug' => $data['role_slug'] ?? $user->role_slug,
@@ -299,8 +297,6 @@ class UserController extends Controller {
             'max_attendance' => $data['max_attendance'] ?? $user->max_attendance,
         ]);
 
-        $user->save();
-
         // Return a success response
         return response()->json([
             'success' => true,
@@ -313,6 +309,9 @@ class UserController extends Controller {
      * @urlParam id required The ID of the user. Example: 2
      */
     public function destroy(Request $request, $user_id) {
+
+        // Check if the user has permission to view all users
+        $this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo']);
 
         if ($user_id == $request->user()->id) {
             return response()->json([
@@ -331,6 +330,9 @@ class UserController extends Controller {
                 'message' => 'User not found',
             ], 404);
         }
+
+        // Get all attendances of the user and delete them
+        $user->attendances()->delete();
 
         $user->tokens()->delete();
         $user->delete();
