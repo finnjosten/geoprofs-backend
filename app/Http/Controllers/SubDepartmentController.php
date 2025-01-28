@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Subdepartment;
-use App\Http\Requests\StoreSubdepartmentRequest;
-use App\Http\Requests\UpdateSubdepartmentRequest;
+use Illuminate\Support\Facades\Request;
 
 class SubdepartmentController extends Controller {
 
@@ -25,7 +24,7 @@ class SubdepartmentController extends Controller {
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSubdepartmentRequest $request) {
+    public function store(Request $request) {
         //
     }
 
@@ -46,7 +45,7 @@ class SubdepartmentController extends Controller {
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSubdepartmentRequest $request, Subdepartment $Subdepartment) {
+    public function update(Request $request, Subdepartment $Subdepartment) {
         //
     }
 

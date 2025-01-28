@@ -43,9 +43,10 @@ class AuthController extends Controller {
 
         $user = Auth::user();
 
+        ////// DISABLED //////
         // Check if user is blocked or needs verification
 
-        if ($user->blocked) {
+        /* if ($user->blocked) {
             return response()->json([
                 'error' => 'User is blocked',
                 'code' => 'blocked',
@@ -58,9 +59,11 @@ class AuthController extends Controller {
                 'error' => 'User needs verification',
                 'code' => 'verification_required',
             ], 401);
-        }
+        } */
+       
 
         // Check if the user already has a token
+        // Limit users to only one session at a time
         if ($user->tokens()->count() > 0) {
             // Delete the user's token
             $user->tokens()->delete();

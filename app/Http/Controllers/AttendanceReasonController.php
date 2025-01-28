@@ -13,6 +13,9 @@ class AttendanceReasonController extends Controller
      * Display a listing of the resource.
      */
     public function index() {
+
+        // No perms check needed as this is a public route
+
         $reasons = AttendanceReason::all();
 
         if (empty($reasons)) {
@@ -33,6 +36,9 @@ class AttendanceReasonController extends Controller
      * Display the specified resource.
      */
     public function show($slug) {
+
+        // No perms check needed as this is a public route
+
         $reason = AttendanceReason::where('slug', $slug)->first();
 
         if (empty($reason)) {
@@ -53,6 +59,10 @@ class AttendanceReasonController extends Controller
      * Show the form for creating a new resource.
      */
     public function store() {
+
+        // Check if the user has the correct permissions
+        $this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo']);
+
         $data = Request::only('slug', 'name', 'description', 'default');
 
         // Check if the default is set if not set it to false other wise get the bool value
@@ -71,7 +81,8 @@ class AttendanceReasonController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'error' => $validator->errors(),
+                'error' => "Validation error",
+                'errors' => $validator->errors(),
                 'code' => 'validation_error',
             ], 422);
         }
@@ -96,6 +107,10 @@ class AttendanceReasonController extends Controller
      * Update the specified resource in storage.
      */
     public function update($slug) {
+
+        // Check if the user has the correct permissions
+        $this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo']);
+
         $data = Request::only('slug', 'name', 'description');
 
         // Check if the default is set if not set it to false other wise get the bool value
@@ -124,7 +139,8 @@ class AttendanceReasonController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'error' => $validator->errors(),
+                'error' => "Validation error",
+                'errors' => $validator->errors(),
                 'code' => 'validation_error',
             ], 422);
         }
@@ -149,6 +165,9 @@ class AttendanceReasonController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy($slug) {
+
+        // Check if the user has the correct permissions
+        $this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo']);
 
         $reason = AttendanceReason::where('slug', $slug)->first();
 

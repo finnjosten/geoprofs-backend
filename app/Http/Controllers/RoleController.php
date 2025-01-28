@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Role;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Request;
 
 class RoleController extends Controller {
-    
+
     /**
      * Display a listing of the resource.
      */
@@ -14,7 +14,18 @@ class RoleController extends Controller {
 
         $roles = Role::all();
 
-        return response()->json(["data" => $roles]);
+        if (!$roles) {
+            return response()->json([
+                'error' => 'No roles found',
+                'message' => 'No roles found!',
+                'code' => 'no_roles_found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            "roles" => $roles,
+        ]);
     }
 
     /**
