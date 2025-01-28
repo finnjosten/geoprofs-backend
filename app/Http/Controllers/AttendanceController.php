@@ -30,7 +30,7 @@ class AttendanceController extends Controller
         $user = $request->user();
 
         // If user is a normal person only give back his own attendance
-        if ($user->role_slug == 'medewerker') {
+        if (!$this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo'], false)) {
             $attendances = Attendance::where('user_id', $user->id)->get();
         } else {
             $attendances = Attendance::get();

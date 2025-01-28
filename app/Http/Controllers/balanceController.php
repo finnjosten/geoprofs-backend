@@ -41,4 +41,23 @@ class BalanceController extends Controller {
 
     }
 
+
+    public function changeBalance(Request $request, User $user) {
+
+        $this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo'], false);
+
+        $request->validate([
+            'balance' => 'required|integer'
+        ]);
+
+        $user->used_attendance = $request->balance;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Used balance changed successfully'
+        ]);
+
+    }
+
 }

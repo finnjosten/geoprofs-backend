@@ -60,8 +60,10 @@ class AuthController extends Controller {
                 'code' => 'verification_required',
             ], 401);
         } */
+       
 
         // Check if the user already has a token
+        // Limit users to only one session at a time
         if ($user->tokens()->count() > 0) {
             // Delete the user's token
             $user->tokens()->delete();
