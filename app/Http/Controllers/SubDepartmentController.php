@@ -5,6 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Subdepartment;
 use Illuminate\Support\Facades\Request;
 
+/**
+ * @group Subdepartment management
+ * @authenticated
+ *
+ * APIs for managing users
+ */
 class SubdepartmentController extends Controller {
 
     /**
