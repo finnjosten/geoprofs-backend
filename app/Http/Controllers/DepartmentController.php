@@ -5,6 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Department;
 use Illuminate\Support\Facades\Request;
 
+/**
+ * @group Department management
+ * @authenticated
+ *
+ * APIs for managing users
+ */
 class DepartmentController extends Controller {
 
     /**
