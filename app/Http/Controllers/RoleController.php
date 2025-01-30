@@ -5,6 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use Illuminate\Support\Facades\Request;
 
+/**
+ * @group Role management
+ * @authenticated
+ *
+ * APIs for managing users
+ */
 class RoleController extends Controller {
 
     /**
