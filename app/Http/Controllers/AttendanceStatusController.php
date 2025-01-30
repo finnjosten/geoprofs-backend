@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\Validator;
  *
  * APIs for managing users
  */
-class AttendanceStatusController extends Controller
-{
+class AttendanceStatusController extends Controller {
+
     /**
-     * Display a listing of the resource.
+     * Return all the statuses.
      */
     public function index() {
 
@@ -39,8 +39,11 @@ class AttendanceStatusController extends Controller
         ]);
     }
 
+
     /**
-     * Display the specified resource.
+     * Return the specified status.
+     *
+     * @urlParam slug required The slug of the status to get. Example: aanwezig
      */
     public function show($slug) {
 
@@ -62,8 +65,10 @@ class AttendanceStatusController extends Controller
         ]);
     }
 
+
     /**
-     * Show the form for creating a new resource.
+     * Store the new status.
+     *
      * @bodyParam slug              string required The slug of the status  Example: aanwezig
      * @bodyParam name              string required The name of the status  Example: Aanwezig
      * @bodyParam description       string The description of the status    Example: De gebruiker is aanwezig
@@ -139,8 +144,10 @@ class AttendanceStatusController extends Controller
         ]);
     }
 
+
     /**
-     * Update the specified resource in storage.
+     * Update the specified status.
+     *
      * @urlParam slug required The slug of the status. Example: aanwezig
      * @bodyParam slug              string required The slug of the status  Example: aanwezig
      * @bodyParam name              string required The name of the status  Example: Aanwezig
@@ -227,8 +234,10 @@ class AttendanceStatusController extends Controller
         ]);
     }
 
+
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified status.
+     *
      * @urlParam slug required The slug of the status. Example: aanwezig
      */
     public function destroy($slug) {
@@ -250,4 +259,5 @@ class AttendanceStatusController extends Controller
             "message" => "Status deleted successfully"
         ]);
     }
+
 }

@@ -19,11 +19,10 @@ use App\Models\Day;
  *
  * APIs for managing users
  */
-class AttendanceController extends Controller
-{
+class AttendanceController extends Controller {
 
     /**
-     * Display a listing of the resource.
+     * Return all the attendances.
      */
     public function index(Request $request) {
 
@@ -51,9 +50,9 @@ class AttendanceController extends Controller
     }
 
 
-
     /**
-     * Store a newly created attendance.
+     * Store the new attendance.
+     *
      * @bodyParam date                 date of the attendance              Example: 2025-01-01
      * @bodyParam morning              the status for the monring          Example: 1 | max: 5
      * @bodyParam afternoon            the status for the monring          Example: 1 | max: 5
@@ -133,8 +132,10 @@ class AttendanceController extends Controller
 
     }
 
+
     /**
-     * Display the specified attendance.
+     * Return the specified attendance.
+     *
      * @urlParam id required The ID of the attendance. Example: 2
      */
     public function show(Request $request, $attendance_id) {
@@ -175,8 +176,10 @@ class AttendanceController extends Controller
         ]);
     }
 
+
     /**
-     * Update the specified resource in storage.
+     * Update the specified attendance.
+     *
      * @urlParam id required The ID of the attendance. Example: 2
      * @bodyParam date                 date of the attendance              Example: 2025-01-01
      * @bodyParam morning              the status for the monring          Example: 1 | max: 5
@@ -278,8 +281,10 @@ class AttendanceController extends Controller
         ]);
     }
 
+
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified attendance.
+     *
      * @urlParam id required The ID of the attendance. Example: 2
      */
     public function destroy(Request $request, $attendance_id) {
@@ -321,10 +326,6 @@ class AttendanceController extends Controller
             'message' => 'Attendance can not be deleted so it has been changed back to a default state',
         ]);
     }
-
-
-
-
 
 
     /**

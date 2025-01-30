@@ -7,10 +7,17 @@ use App\Models\AttendanceReason;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 
-class AttendanceReasonController extends Controller
-{
+
+/**
+ * @group Attendance Reason management
+ * @authenticated
+ *
+ * APIs for managing users
+ */
+class AttendanceReasonController extends Controller {
+
     /**
-     * Display a listing of the resource.
+     * Return all the reasons.
      */
     public function index() {
 
@@ -32,8 +39,11 @@ class AttendanceReasonController extends Controller
         ]);
     }
 
+
     /**
-     * Display the specified resource.
+     * Return the specified reason.
+     *
+     * @urlParam slug required The slug of the reason to get. Example: ziek
      */
     public function show($slug) {
 
@@ -55,8 +65,14 @@ class AttendanceReasonController extends Controller
         ]);
     }
 
+
     /**
-     * Show the form for creating a new resource.
+     * Store the new reason.
+     *
+     * @bodyParam slug string required The slug of the reason. Example: ziek
+     * @bodyParam name string required The name of the reason. Example: Ziek
+     * @bodyParam description string The description of the reason. Example: Ziek melden
+     * @bodyParam default boolean The default value of the reason. Example: false
      */
     public function store() {
 
@@ -103,8 +119,15 @@ class AttendanceReasonController extends Controller
         ]);
     }
 
+
     /**
-     * Update the specified resource in storage.
+     * Update the specified reason.
+     *
+     * @urlParam slug required The slug of the reason to get. Example: ziek
+     * @bodyParam slug string required The slug of the reason. Example: ziek
+     * @bodyParam name string required The name of the reason. Example: Ziek
+     * @bodyParam description string The description of the reason. Example: Ziek melden
+     * @bodyParam default boolean The default value of the reason. Example: false
      */
     public function update($slug) {
 
@@ -161,8 +184,11 @@ class AttendanceReasonController extends Controller
         ]);
     }
 
+
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified reason.
+     *
+     * @urlParam slug required The slug of the reason to get. Example: ziek
      */
     public function destroy($slug) {
 
@@ -194,4 +220,5 @@ class AttendanceReasonController extends Controller
             "message" => "Reason deleted successfully"
         ]);
     }
+
 }
