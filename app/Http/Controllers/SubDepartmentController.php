@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Subdepartment;
-use App\Http\Requests\StoreSubdepartmentRequest;
-use App\Http\Requests\UpdateSubdepartmentRequest;
+use Illuminate\Support\Facades\Request;
 
 class SubdepartmentController extends Controller {
 
@@ -12,7 +11,21 @@ class SubdepartmentController extends Controller {
      * Display a listing of the resource.
      */
     public function index() {
-        return response()->json(["data" => Subdepartment::all()]);
+
+        $Subdepartments = Subdepartment::all();
+
+        if (!$Subdepartments) {
+            return response()->json([
+                'error' => 'No Subdepartments found',
+                'message' => 'No Subdepartments found!',
+                'code' => 'no_Subdepartments_found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            "subdepartments" => $Subdepartments,
+        ]);
     }
 
     /**
@@ -25,7 +38,7 @@ class SubdepartmentController extends Controller {
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSubdepartmentRequest $request) {
+    public function store(Request $request) {
         //
     }
 
@@ -46,7 +59,7 @@ class SubdepartmentController extends Controller {
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSubdepartmentRequest $request, Subdepartment $Subdepartment) {
+    public function update(Request $request, Subdepartment $Subdepartment) {
         //
     }
 

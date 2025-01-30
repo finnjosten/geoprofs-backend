@@ -20,6 +20,9 @@ class AttendanceStatusController extends Controller
      * Display a listing of the resource.
      */
     public function index() {
+
+        // No perms check needed as this is a public route
+
         $statuses = AttendanceStatus::all();
 
         if (empty($statuses)) {
@@ -40,6 +43,9 @@ class AttendanceStatusController extends Controller
      * Display the specified resource.
      */
     public function show($slug) {
+
+        // No perms check needed as this is a public route
+
         $status = AttendanceStatus::where('slug', $slug)->first();
 
         if (empty($status)) {
@@ -65,6 +71,10 @@ class AttendanceStatusController extends Controller
      * @bodyParam default           boolean The status is the default status            Example: false
      */
     public function store() {
+
+        // Check if the user has the correct permissions
+        $this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo']);
+
         $data = Request::only('slug', 'name', 'description', 'show_in_agenda', 'default', 'default_after_create', 'default_approve', 'default_deny');
 
         // Check if the show_in_agenda is set if not set it to false other wise get the bool value
@@ -115,7 +125,8 @@ class AttendanceStatusController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'error' => $validator->errors(),
+                'error' => "Validation error",
+                'errors' => $validator->errors(),
                 'code' => 'validation_error',
             ], 422);
         }
@@ -138,7 +149,11 @@ class AttendanceStatusController extends Controller
      * @bodyParam default           boolean The status is the default status            Example: false
      */
     public function update($slug) {
-        $data = Request::only('slug', 'name', 'description', 'show_in_agenda', 'default', 'default_after_create', 'default_approve', 'default_deny');
+
+        // Check if the user has the correct permissions
+        $this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo']);
+
+        $data = Request::only('name', 'description', 'show_in_agenda', 'default', 'default_after_create', 'default_approve', 'default_deny');
 
         // Check if the show_in_agenda is set if not set it to false other wise get the bool value
         if (!isset($data['show_in_agenda'])) {
@@ -198,7 +213,8 @@ class AttendanceStatusController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'error' => $validator->errors(),
+                'error' => "Validation error",
+                'errors' => $validator->errors(),
                 'code' => 'validation_error',
             ], 422);
         }

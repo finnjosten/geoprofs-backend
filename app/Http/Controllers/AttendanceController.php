@@ -26,8 +26,15 @@ class AttendanceController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request) {
-        $user_id = $request->user()->id;
-        $attendances = Attendance::where('user_id', $user_id)->get();
+
+        $user = $request->user();
+
+        // If user is a normal person only give back his own attendance
+        if (!$this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo'], false)) {
+            $attendances = Attendance::where('user_id', $user->id)->get();
+        } else {
+            $attendances = Attendance::get();
+        }
 
         if (empty($attendances)) {
             return response()->json([
@@ -87,7 +94,7 @@ class AttendanceController extends Controller
             return response()->json([
                 'error' => 'Invalid date',
                 'code' => 'invalid_date',
-                'message' => 'You can not add attendance for a future date',
+                'message' => 'You can not add attendance for a past date',
             ], 422);
         }
 
@@ -119,14 +126,14 @@ class AttendanceController extends Controller
         }
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => 'Attendance stored successfully',
             'attendance' => $attendance,
         ]);
 
     }
 
-     /**
+    /**
      * Display the specified attendance.
      * @urlParam id required The ID of the attendance. Example: 2
      */
@@ -153,7 +160,7 @@ class AttendanceController extends Controller
 
         if (
             $attendance_user->id != $request->user()->id &&
-            $attendance_user->supervisor_id != $request->user()->id
+            !$this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo'], false)
         ) {
             return response()->json([
                 'error' => "Unauthorized",
@@ -201,12 +208,12 @@ class AttendanceController extends Controller
 
         if (
             $attendance_user->id != $request->user()->id &&
-            !in_array($current_user->role_slug, ['manager', 'sub-manager', 'staff', 'ceo'])
+            !$this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo'], false)
         ) {
             return response()->json([
                 'error' => "Unauthorized",
                 'code' => 'unauthorized',
-                'message' => 'You are not authorized to view this attendance',
+                'message' => 'You are not authorized to update this attendance',
             ], 401);
         }
 
@@ -232,6 +239,16 @@ class AttendanceController extends Controller
             ], 422);
         }
 
+        if (!$this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo'], false)) {
+            if (isset($data['attendance_status'])) {
+                return response()->json([
+                    'error' => "Unauthorized",
+                    'code' => 'unauthorized',
+                    'message' => 'You are not authorized to update the status of this attendance',
+                ], 401);
+            }
+        }
+
         // Parse the date value
         if (isset($data['date'])) {
             $data['date'] = date('Y-m-d', strtotime($data['date']));
@@ -255,7 +272,7 @@ class AttendanceController extends Controller
         }
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => 'Attendance updated successfully',
             'attendance' => $attendance,
         ]);
@@ -266,6 +283,8 @@ class AttendanceController extends Controller
      * @urlParam id required The ID of the attendance. Example: 2
      */
     public function destroy(Request $request, $attendance_id) {
+
+        $this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo']);
 
         $attendance = Attendance::whereId($attendance_id)->first();
         $attendance_user = User::whereId($attendance->user_id)->first();
@@ -285,18 +304,6 @@ class AttendanceController extends Controller
                 'code' => 'user_not_found',
                 'message' => 'User not found',
             ], 404);
-        }
-
-
-        if (
-            $attendance_user->id != $request->user()->id &&
-            !in_array($current_user->role_slug, ['manager', 'sub-manager', 'staff', 'ceo'])
-        ) {
-            return response()->json([
-                'error' => "Unauthorized",
-                'code' => 'unauthorized',
-                'message' => 'You are not authorized to view this attendance',
-            ], 401);
         }
 
         $status = AttendanceStatus::where('default_after_create', true)->first();
@@ -324,6 +331,9 @@ class AttendanceController extends Controller
      * Approve the specified attendance.
      */
     public function approve(Request $request, $attendance_id) {
+
+        // Check permissions
+        $this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo']);
 
         $attendance = Attendance::whereId($attendance_id)->first();
         $attendance_user = User::whereId($attendance->user_id)->first();
@@ -414,7 +424,7 @@ class AttendanceController extends Controller
         }
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => 'Attendance approved successfully',
             'attendance' => $attendance,
         ]);
@@ -428,6 +438,9 @@ class AttendanceController extends Controller
      * Deny the specified attendance.
      */
     public function deny(Request $request, $attendance_id) {
+
+        // Check permissions
+        $this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo']);
 
         $attendance = Attendance::whereId($attendance_id)->first();
         $attendance_user = User::whereId($attendance->user_id)->first();
@@ -478,18 +491,11 @@ class AttendanceController extends Controller
         }
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => 'Attendance approved successfully',
             'attendance' => $attendance,
         ]);
 
     }
-
-
-
-
-
-
-
 
 }

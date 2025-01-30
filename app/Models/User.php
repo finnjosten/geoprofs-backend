@@ -22,8 +22,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role_slug',
-        'deparment_slug',
-        'subdeparment_slug',
+        'department_slug',
+        'subdepartment_slug',
         'suporvisor_id',
 
         'verified',
@@ -86,7 +86,7 @@ class User extends Authenticatable
         return;
     }
 
-    public function attendance() {
+    public function attendances() {
         return $this->hasMany(Attendance::class);
     }
 }
