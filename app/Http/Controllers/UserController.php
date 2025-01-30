@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
  */
 class UserController extends Controller {
 
+    // Define the request fields
     private $request_fields = array(
         'email',
         'password',
@@ -35,8 +36,9 @@ class UserController extends Controller {
         'max_attendance'
     );
 
+
     /**
-     * Display all the users.
+     * Return all the users.
      */
     public function index() {
 
@@ -59,8 +61,10 @@ class UserController extends Controller {
         ]);
     }
 
+
     /**
      * Store a newly created user.
+     *
      * @bodyParam email                 email of the user.              Example: john@geoprofs.com
      * @bodyParam password              password of the user.           Example: password1
      * @bodyParam role_slug             slug of the role.               Example: medewerker
@@ -148,7 +152,8 @@ class UserController extends Controller {
     }
 
     /**
-     * Display the specified user.
+     * Return the specified user.
+     *
      * @urlParam id required The ID of the user. Example: 2
      */
     public function show(Request $request, $user_id) {
@@ -180,8 +185,9 @@ class UserController extends Controller {
         ]);
     }
 
+
     /**
-     * Display the current user.
+     * Return the current user.
      */
     public function showCurrent(Request $request) {
         $user = $request->user();
@@ -200,8 +206,10 @@ class UserController extends Controller {
         ]);
     }
 
+
     /**
      * Update the specified user.
+     *
      * @urlParam id required The ID of the user. Example: 2
      * @bodyParam email                 email of the user.              Example: john@geoprofs.com | null
      * @bodyParam role_slug             slug of the role.               Example: medewerker | null
@@ -304,8 +312,10 @@ class UserController extends Controller {
         ]);
     }
 
+
     /**
      * Remove the specified user.
+     *
      * @urlParam id required The ID of the user. Example: 2
      */
     public function destroy(Request $request, $user_id) {

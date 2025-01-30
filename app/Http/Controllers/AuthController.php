@@ -15,6 +15,12 @@ use Illuminate\Support\Facades\Auth;
  */
 class AuthController extends Controller {
 
+    /**
+     * Register a new user
+     *
+     * @bodyParam email string required The email of the user. Example: john@geoprofs.com
+     * @bodyParam password string required The password of the user. Example: password
+     */
     public function login(Request $request) {
 
         $data = $request->only('email', 'password');
@@ -60,7 +66,7 @@ class AuthController extends Controller {
                 'code' => 'verification_required',
             ], 401);
         } */
-       
+
 
         // Check if the user already has a token
         // Limit users to only one session at a time
@@ -78,6 +84,12 @@ class AuthController extends Controller {
         ]);
     }
 
+
+    /**
+     * Logout the user
+     *
+     * @authenticated
+     */
     public function logout(Request $request) {
         if (!$request->user()) {
             return response()->json([
@@ -96,6 +108,9 @@ class AuthController extends Controller {
 
     /**
      * Login for testing (create a user and return the token + user)
+     *
+     * @authenticated
+     * @bodyParam testing_key string required The testing key. Example: abcdefghijklmnopqrstuvwxyz123456
      */
     public function testing(Request $request) {
         $data = $request->only('testing_key');
@@ -140,6 +155,8 @@ class AuthController extends Controller {
 
     /**
      * Logout for testing (delete the user for next use)
+     *
+     * @authenticated
      */
     public function testing_logout(Request $request) {
         if (!$request->user()) {
