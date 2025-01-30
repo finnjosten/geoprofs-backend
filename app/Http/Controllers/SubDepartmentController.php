@@ -11,7 +11,21 @@ class SubdepartmentController extends Controller {
      * Display a listing of the resource.
      */
     public function index() {
-        return response()->json(["data" => Subdepartment::all()]);
+
+        $Subdepartments = Subdepartment::all();
+
+        if (!$Subdepartments) {
+            return response()->json([
+                'error' => 'No Subdepartments found',
+                'message' => 'No Subdepartments found!',
+                'code' => 'no_Subdepartments_found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            "subdepartments" => $Subdepartments,
+        ]);
     }
 
     /**

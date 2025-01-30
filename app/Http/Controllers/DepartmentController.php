@@ -14,7 +14,18 @@ class DepartmentController extends Controller {
 
         $departments = Department::all();
 
-        return response()->json(["departments" => $departments]);
+        if (!$departments) {
+            return response()->json([
+                'error' => 'No departments found',
+                'message' => 'No departments found!',
+                'code' => 'no_departments_found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            "departments" => $departments,
+        ]);
     }
 
     /**

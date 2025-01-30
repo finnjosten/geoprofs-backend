@@ -101,7 +101,7 @@ class AgendaController extends Controller
         }
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'agenda' => $agenda,
         ]);
     }
@@ -168,7 +168,7 @@ class AgendaController extends Controller
         }
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => 'Attendance updated successfully'
         ]);
 

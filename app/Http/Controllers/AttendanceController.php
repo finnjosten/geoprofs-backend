@@ -126,7 +126,7 @@ class AttendanceController extends Controller
         }
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => 'Attendance stored successfully',
             'attendance' => $attendance,
         ]);
@@ -272,7 +272,7 @@ class AttendanceController extends Controller
         }
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => 'Attendance updated successfully',
             'attendance' => $attendance,
         ]);
@@ -424,7 +424,7 @@ class AttendanceController extends Controller
         }
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => 'Attendance approved successfully',
             'attendance' => $attendance,
         ]);
@@ -491,7 +491,7 @@ class AttendanceController extends Controller
         }
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => 'Attendance approved successfully',
             'attendance' => $attendance,
         ]);
