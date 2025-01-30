@@ -18,8 +18,7 @@ use Illuminate\Support\Facades\Validator;
  *
  * APIs for managing the agenda
  */
-class AgendaController extends Controller
-{
+class AgendaController extends Controller {
 
     /**
      * Retrieve the current agenda
@@ -106,8 +105,10 @@ class AgendaController extends Controller
         ]);
     }
 
+
     /**
      * Update the specified resource in storage.
+     * @deprecated
      */
     public function update(Request $request, string $id) {
         $data = $request->only('user_id', 'week_number', 'date', 'morning', 'afternoon');
@@ -175,14 +176,15 @@ class AgendaController extends Controller
 
     }
 
+
+    /**
+     * Generate the agenda for the previous & next 3 years
+     */
     public function generate() {
-        // get the last 3 years,
-        // loop over every week
-        // loop over every day
-        // and save all those years, weeks and days in he db
 
         try {
 
+            // Get the previous and next 3 years
             $years = [];
             for ($i = 0; $i < 3; $i++) {
                 $years[] = date('Y', strtotime("-$i year"));
@@ -191,6 +193,7 @@ class AgendaController extends Controller
                 $years[] = date('Y', strtotime("+$i year"));
             }
 
+            // loop over all the years
             foreach ($years as $year) {
 
                 $db_year = Year::firstOrCreate(['year_number' => $year]);
@@ -232,4 +235,5 @@ class AgendaController extends Controller
         ]);
 
     }
+
 }

@@ -16,6 +16,7 @@ class BalanceController extends Controller {
 
     /**
      * Get the balance of a user
+     *
      * @urlParam id optional The ID of the user to get the balance of. Example: 2
      */
     public function balance(User $user = null) {
@@ -42,6 +43,12 @@ class BalanceController extends Controller {
     }
 
 
+    /**
+     * Set the balance for a user
+     *
+     * @urlParam id optional The ID of the user to get the balance of. Example: 2
+     * @bodyParam balance integer required The new balance to set. Example: 10
+     */
     public function changeBalance(Request $request, User $user) {
 
         $this->checkPermission(['manager', 'sub-manager', 'staff', 'ceo'], false);
