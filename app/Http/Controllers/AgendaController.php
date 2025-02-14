@@ -60,7 +60,7 @@ class AgendaController extends Controller {
                         foreach ($day->attendance as $attendance) {
 
                             $attendance_status = AttendanceStatus::where('slug', $attendance->attendance_status)->first();
-                            if ($attendance_status->show_in_agenda === false) {
+                            if (boolval($attendance_status->show_in_agenda) === false) {
                                 continue;
                             }
 
