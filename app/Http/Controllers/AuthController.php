@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Auth;
 class AuthController extends Controller {
 
     /**
-     * Register a new user
+     * Login the user
      *
      * @bodyParam email string required The email of the user. Example: john@geoprofs.com
      * @bodyParam password string required The password of the user. Example: password

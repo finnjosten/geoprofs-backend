@@ -43,6 +43,21 @@ class AttendanceController extends Controller {
             ], 404);
         }
 
+        foreach ($attendances as $attendance) {
+
+            $user = User::whereId($attendance->user_id)->first();
+            $day = Day::whereId($attendance->day_id)->first();
+
+            $attendance->user = [
+                'email' => $user->email,
+                'first_name' => $user->first_name,
+                'sure_name' => $user->sure_name,
+            ];
+            $attendance->day = [
+                'date' => $day->date,
+            ];
+        }
+
         return response()->json([
             "success" => true,
             "attendances" => $attendances
@@ -169,6 +184,17 @@ class AttendanceController extends Controller {
                 'message' => 'You are not authorized to view this attendance',
             ], 401);
         }
+
+        $day = Day::whereId($attendance->day_id)->first();
+
+        $attendance->user = [
+            'email' => $attendance_user->email,
+            'first_name' => $attendance_user->first_name,
+            'sure_name' => $attendance_user->sure_name,
+        ];
+        $attendance->day = [
+            'date' => $day->date,
+        ];
 
         return response()->json([
             'success' => true,
